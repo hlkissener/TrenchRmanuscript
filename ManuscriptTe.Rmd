@@ -1,0 +1,107 @@
+---
+title: "Manuscript Te example"
+author: "Lauren Buckley"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Function testing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+##Load TrenchR package
+library(TrenchR)
+```
+
+
+```{r}
+#Grasshopper biophys
+library(TrenchR)
+library(maptools)
+library(ggplot2)
+
+count=function(x){length(na.omit(x))}
+
+error.bars= function(bloc, thing, se, cols="black", ltys="solid"){
+  arrows(bloc, thing-se, bloc, thing+se, code=3, angle=90,length=0, col=cols, lty=ltys)
+}
+#--------------------------
+#Grasshopper data
+setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
+spec.dat=read.csv("SpecData.csv")
+
+#read weather data
+dat=read.csv("DatAll_Pace2011.csv", sep=",", na.strings = c("-49.99","NA"))
+#match site data
+sites=read.csv("SiteElevations.csv", sep=",")
+
+#combine soil temperatures
+dat$SoilTemp= rowMeans(dat[,c("SoilTemp","SoilTemperature")], na.rm = TRUE) 
+
+#ditch problematic temperatures
+dat$Temp[dat$Temp< -10]=NA
+
+#add elevation
+match1= match(dat$site, sites$Site)
+dat$Elev=sites[match1,"Elevation"]
+
+#----------------
+
+z<-0.001 #specify distance from ground 
+
+#calculate Julian day
+date.ct <- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST")
+dat$J= round(as.numeric(julian(date.ct, origin = as.Date("2011-01-01") )))
+dat$hour= date.ct$hour
+
+#match site data
+match1= match(dat$site, sites$Site) 
+dat$lon= sites$Lon[match1]
+dat$lat= sites$Lat[match1]
+
+#Calculate zenith
+dat$psi= zenith_angle(dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
+
+#------------------------
+##Calculate Te for each species
+dat$Te<-Tb_grasshopper(T_a=dat$Temp, T_g=dat$SoilTemp, u=dat$Wind, H=dat$Rad, K_t=0.7, psi=dat$psi, L=21.1, Acondfact=0.3)
+#fix infinite
+dat$Te[is.infinite(dat$Te)]<-NA
+#ditch big numbers for now
+dat$Te[dat$Te>100]<-NA
+
+#----------------------------------------
+#PLOTS
+
+#Subset to August
+dat.dt<- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST") #as.Date
+dataug= subset(dat, dat.dt$mon==7)
+#subset to day
+dataug= subset(dataug, dataug$Rad>5)
+#aggregate by day and hour
+dat.dh= aggregate(dataug, by=list(dataug$site, dataug$hour), FUN=mean, na.rm=TRUE)
+
+```
+
+```{r}
+library(reshape2)
+
+#convert to long format
+dat.s= dat.dh[,c("Rad","Temp","Wind","DodgeiTemp","SoilTemp","SanguinipesTemp","BivatatusTemp","Elev","J", "hour","psi","Te")]
+
+dat.s= melt(dat.s, id = c("Elev", "J","hour","psi"))
+
+#plot
+dat.s= subset(dat.s, dat.s %in% c("Temp","SoilTemp","SanguinipesTemp","Te") )
+
+ggplot(data=dat.s, aes(x=hour, y = value, color=variable))+geom_line( ) #+
+#  facet_wrap(~Elev)
+
+```
+
