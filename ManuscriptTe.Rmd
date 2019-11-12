@@ -21,9 +21,9 @@ library(maptools)
 library(ggplot2)
 ```
 
-#Microclimate calculations
-u_z=function(z, d=0.229, z_0=0.0208, u_star= 0.114, k=0.41) u_star/k*log((z-d)/z_0)
 
+
+#Microclimate calculations
 ```{r}
 setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
 dat=read.csv("microclimate_C1.csv", sep=",", na.strings = c("-49.99","NA"))
@@ -39,22 +39,53 @@ C1.hr<- aggregate(C1all[,c(2:8,13:22)], by=list(C1all$hour), FUN=mean, na.rm=TRU
 names(C1.hr)[1]="hour"
 
 C1.hr= as.matrix(C1.hr)
-#surface roughness
-z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.5,1.5))
+```
 
+We can estimate surface roughness across hours:
+```{r}
+#surface roughness
+z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.0,1.5))
+
+```
+
+We calculate the temperature and windspeed profiles for a given hour using multiple functions in TrenchR.
+```{r}
 z.seq <- seq(0, 2, by = 0.1)
 
-for(hr in 1:24){
-t.seq1 <- air_temp_profile_neutral(T_r=C1.hr[hr,"Air0.5m"], zr=0.5, z0=0.02, z=2, T_s=C1.hr[hr,"Soil"])
-t.seq2 <- air_temp_profile(T_r=C1.hr[hr,"Air0.5m"], u_r=C1.hr[hr,"Wind0.5m"], zr=0.5, z0=0.02, z=2, T_s=C1.hr[hr,"Soil"])
-t.seq3 <- air_temp_profile_segment(T_r=C1.hr[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")],u_r=C1.hr[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=0.02, z=2, T_s=C1.hr[hr,"Soil"])
+#subset to day and hour
+C1.sub= subset(C1.dayhr, C1.dayhr$day==10)
+hr=10
 
-u.seq1<- wind_speed_profile_neutral(u_r=C1.hr[hr,"Wind0.5m"], zr=0.5, z0=0.02, z=2)
-u.seq2<- wind_speed_profile(u_r=C1.hr[hr,"Wind0.5m"], zr=0.5, z0=0.02, z=2)
-u.seq3<- wind_speed_profile_segment(u_r=C1.hr[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=0.02, z=2)
-}
+#estimate profiles
+#temperature
+t.seq1= sapply(z.seq, FUN=air_temp_profile_neutral, T_r=C1.sub[hr,"Air0.5m"], z0=z0[hr], zr=0.5, T_s=C1.sub[hr,"Soil"])
 
-#plot(t.seq, z.seq, type = "l", xlab = "Temperature (C)", ylab = "z (height above ground in m)")
+t.seq2= sapply(z.seq, FUN=air_temp_profile, T_r=C1.sub[hr,"Air0.5m"], u_r=C1.hr[hr,"Wind0.5m"], zr=0.5, z0=z0[hr], T_s=C1.sub[hr,"Soil"])
+
+t.seq3= sapply(z.seq, FUN=air_temp_profile_segment, T_r=C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")],u_r=C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=rep(z0[hr],4), T_s=C1.sub[hr,"Soil"])
+
+#windspeed
+u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
+
+u.seq2= sapply(z.seq, FUN=wind_speed_profile, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
+
+u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=rep(z0[hr],4))
+
+#replace infinity with N
+t.seq1[which(!is.finite(t.seq1))]=NA
+```
+
+We then plot the temperature and windspeed profiles.
+```{r}
+plot(t.seq1, z.seq, type = "l", xlab = "Temperature (C)", ylab = "z (height above ground in m)")
+points(t.seq2, z.seq, type = "l", lty="dashed")
+points(t.seq3, z.seq, type = "l", lty="dotted")
+points(C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")], c(0.25,0.5,1,1.5), type = "l", col="red")
+
+plot(u.seq1, z.seq, type = "l", xlab = "windspeed (m/s)", ylab = "z (height above ground in m)")
+points(u.seq2, z.seq, type = "l", lty="dashed")
+points(u.seq3, z.seq, type = "l", lty="dotted")
+points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "l", col="red")
 ```
 
 #Te calculation
