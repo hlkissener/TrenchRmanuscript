@@ -54,6 +54,7 @@ WE ASSUME $T_b=T_a$ TO ILLUSTRATE CALCULATIONS
 Let us first prepare the environmental data for analysis. We will need to estimate hourly air and soil temperatures and radiation. We start by estimating day of year and the timing of sunrise and sunset:
 ```{r}
 library(TrenchR)
+
 #set up input data as variables
 lat=35.69; lon= -105.944; elev=2121
 Tmin=10; Tmax=25; Tmin_s=15; Tmax_s=30
@@ -166,8 +167,8 @@ for(hr in 1:24) Qcond[hr]=Qconduction_animal(T_g= Ts[hr]+273.15,T_b=Ta[hr]+273.1
 
 We assume, as in generally done for lizards, that heat exchange associated with metabolism and evaporation is negliglible:
 ```{r}
-Qmet= 0.1
-Qevap= 0.1
+Qmet= 0
+Qevap= 0
 ```
 
 The full heat budget can be calculated as follows: 
@@ -203,8 +204,9 @@ for(hr in 1:24) Te4[hr]= Tb_Fei(TAH=Ta[hr]+273.15, T_s=Ts[hr]+273.15, T_a=Ts[hr]
 We next plot the diurnal trends in environmental data and the operative data.
 
 ```{r}
-plot(1:24, (Te-273), type="l", xlab="Hour", ylab="Temperature (°C)", col="blue") #Gates
-points(1:24, Te2-273, type="l", col="blue", lty="dotted") #Campbell
+par(mar=c(5, 4, 4, 8) + 0.1)
+plot(1:24, (Te-273.15), type="l", xlab="Hour", ylab="Temperature (°C)", col="blue") #Gates
+points(1:24, Te2-273.15, type="l", col="blue", lty="dotted") #Campbell
 points(1:24, Te3, type="l", col="blue", lty="dashed") #Buckley 2008
 #points(1:24, Te4, type="l", col="red", lty="solid") #Fei et al.
 points(1:24, Ta, type="l", col="orange")
