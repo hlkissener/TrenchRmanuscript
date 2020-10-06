@@ -2,7 +2,9 @@
 title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
 author: "Lauren B. Buckley, Bryan Briones Ortiz, Aji John, Ofir Levy, Yutaro Sakairi"
 date: "February 4, 2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -149,7 +151,7 @@ heat_transfer_coefficient_simple(V=0.5,D=0.05)
 
 We estimate convective heat exchange between the animal and surrounding air using ithe following relationship:
 $$Q_{conv}= ef*H_L*(A*proportion)*(T_a-T_b),$$
-where an enhancement factor, $ef$, multiplier can be incorported to account for increases in heat exchange resulting from air turbulance in field conditions
+where an enhancement factor, $ef$, multiplier can be incorporated to account for increases in heat exchange resulting from air turbulance in field conditions
 
 The function is available in R assuming that 2/3 of the lizard's surface area is exchanging heat through convection. We note we currently estimate no convection since we are assuming $Tb=Ta$ for illustration purposes:
 ```{r}
@@ -165,7 +167,7 @@ Qcond= rep(NA, 24)
 for(hr in 1:24) Qcond[hr]=Qconduction_animal(T_g= Ts[hr]+273.15,T_b=Ta[hr]+273.15,d=10^-6,K=K,A=A, proportion=0.33)
 ```
 
-We assume, as in generally done for lizards, that heat exchange associated with metabolism and evaporation is negliglible:
+We assume, as in generally done for lizards, that heat exchange associated with metabolism and evaporation is negligible:
 ```{r}
 Qmet= 0
 Qevap= 0
@@ -182,7 +184,7 @@ Te= rep(NA, 24)
 for(hr in 1:24) Te[hr]= Tb_Gates(A=A, D=svl, psa_dir=psa[hr], psa_ref=1-psa[hr], psa_air=0.67, psa_g=0.33, T_g=Ts[hr]+273.15, T_a=Ta[hr]+273.15, Qabs=Qabs[hr], epsilon=epsilon_s, H_L=H_L, ef=1.3, K=K)
 ```
 
-We also implement a similiar but simplied energy balance. The energy balance omits conduction with the ground and thus underestimates temperatures, but we implement it for comparison purposes:
+We also implement a similar but simplified energy balance. The energy balance omits conduction with the ground and thus underestimates temperatures, but we implement it for comparison purposes:
 ```{r}
 Te2= rep(NA, 24)
 for(hr in 1:24) Te2[hr]= Tb_CampbellNorman(T_a=Ta[hr]+273.15, S=Qabs[hr]/svl, epsilon=epsilon_s, c_p=29.3, D=svl, V=V)
@@ -195,8 +197,8 @@ Te3= rep(NA, 24)
 for(hr in 1:24) Te3[hr]= Tb_lizard(T_a=Ta[hr], T_g=Ts[hr], u=V, svl=svl*1000, m=mass, psi=psi_deg[hr], rho_S=rho, elev=elev, doy=doy, sun=TRUE, surface=TRUE, alpha_S=a, alpha_L=0.965, epsilon_s=epsilon_s, F_d=0.8, F_r=0.5, F_a=0.5, F_g=0.5)
 
 Te4= rep(NA, 24)
-for(hr in 1:24) Te4[hr]= Tb_Fei(TAH=Ta[hr]+273.15, T_s=Ts[hr]+273.15, T_a=Ts[hr]+273.15, UDT=Qabs[hr], GLW=Qabs[hr],  shade=0)
-#FIX UDT?
+for(hr in 1:24) Te4[hr]= Tb_Fei(T_a=Ta[hr]+273.15, T_g=Ts[hr]+273.15, H=Qabs[hr], lw=Qabs[hr], shade=0, m=mass, Acondfact =0.1, Agradfact =0.3)
+#CHECK
 
 ```
 
