@@ -2,13 +2,12 @@
 title: "Manuscript Te example"
 author: "Lauren Buckley"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Function testing}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+  rmarkdown::html_vignette: default
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -19,16 +18,19 @@ knitr::opts_chunk$set(echo = TRUE)
 library(TrenchR)
 library(maptools)
 library(ggplot2)
+library(reshape)
 ```
 
+#APPENDIX S1
+We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. We first use a times series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. We then use a time series of air and surface temperature, windspeed, and solar radiation collected a a single height to implement and test a biophysical model for grasshoppers.
 
-
-#Microclimate calculations
+#Microclimate models
 ```{r}
 setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
 C1all=read.csv("microclimate_C1.csv", sep=",", na.strings = c("-49.99","NA"))
 ```
 
+We first examine temperature and wind speed profiles and use them to estimate surface roughness.
 ```{r}
 #ANALYZE SURFACE ROUGHNESS AND PROFILES
 C1all$day=as.POSIXlt(as.character(C1all$datetime), tz='MST', format="%m/%d/%Y %H:%M")$mday
@@ -42,14 +44,14 @@ names(C1.hr)[1]="hour"
 C1.hr= as.matrix(C1.hr)
 ```
 
-We can estimate surface roughness across hours:
+We can use wind speed variation across elevations to estimate surface roughness across hours.
 ```{r}
 #surface roughness
 z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.0,1.5))
 
 ```
 
-We calculate the temperature and windspeed profiles for a given hour using multiple functions in TrenchR.
+We calculate the temperature and wind speed profiles for a given hour using multiple functions in TrenchR.
 ```{r}
 z.seq <- seq(0, 2, by = 0.1)
 
@@ -68,7 +70,7 @@ t.seq3= sapply(z.seq, FUN=air_temp_profile_segment, T_r=C1.sub[hr, c("Air0.25m",
 #windspeed
 u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
 
-u.seq2= sapply(z.seq, FUN=wind_speed_profile, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
+#u.seq2= sapply(z.seq, FUN=wind_speed_profile, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
 
 u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
 
@@ -76,22 +78,22 @@ u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m
 t.seq1[which(!is.finite(t.seq1))]=NA
 ```
 
-We then plot the temperature and windspeed profiles.
+We then plot the temperature and wind speed profiles.
 ```{r}
 plot(t.seq1, z.seq, type = "l", xlab = "Temperature (C)", ylab = "z (height above ground in m)")
 points(t.seq2, z.seq, type = "l", lty="dashed")
 points(t.seq3, z.seq, type = "l", lty="dotted")
-points(C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")], c(0.25,0.5,1,1.5), type = "l", col="red")
+points(C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 
 plot(u.seq1, z.seq, type = "l", xlab = "windspeed (m/s)", ylab = "z (height above ground in m)")
-points(u.seq2, z.seq, type = "l", lty="dashed")
+#points(u.seq2, z.seq, type = "l", lty="dashed")
 points(u.seq3, z.seq, type = "l", lty="dotted")
-points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "l", col="red")
+points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 ```
 
-#Te calculation
+#Biophysical models
+We first read and process time series of environmental data.
 ```{r}
-
 #Grasshopper data
 setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
 spec.dat=read.csv("SpecData.csv")
@@ -104,16 +106,12 @@ sites=read.csv("SiteElevations.csv", sep=",")
 #combine soil temperatures
 dat$SoilTemp= rowMeans(dat[,c("SoilTemp","SoilTemperature")], na.rm = TRUE) 
 
-#ditch problematic temperatures
+#omit problematic temperatures
 dat$Temp[dat$Temp< -10]=NA
 
 #add elevation
 match1= match(dat$site, sites$Site)
 dat$Elev=sites[match1,"Elevation"]
-
-#----------------
-
-z<-0.001 #specify distance from ground 
 
 #calculate Julian day
 date.ct <- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST")
@@ -133,6 +131,11 @@ dat.dt<- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST") #as.Date
 dataug= subset(dat, dat.dt$mon==7)
 #subset to day
 dat= subset(dataug, dataug$Rad>5)
+```
+
+We scale the air temperature data from 0.5m to grasshopper height (0.001m).
+```{r}
+z<-0.001 #specify distance from ground 
 
 #scale temperature to ground
 dat$Tgrass <- air_temp_profile(T_r=dat$Temp, u_r=dat$Wind, zr=0.5, z0=0.02, z=z, T_s=dat$SoilTemp)
@@ -142,20 +145,19 @@ dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour",
 dat= na.omit(dat)
 ```
 
-
+We then use biophysical models to estimate body temperatures based on air and surface temperatures, wind speed, and solar radiation. We first use a biophysical model specifically configured for grasshoppers.
 ```{r}
 ##Calculate Te for each species
-dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Wind, H=dat$Rad, K_t=0.7, psi=dat$psi, L=0.0211, Acondfact=0.01)  #T_a=dat$Tgrass
+dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Wind, H=dat$Rad, K_t=0.7, psi=dat$psi, L=0.0211, Acondfact=0.01)
 #fix infinite
 dat$Te[is.infinite(dat$Te)]<-NA
 #ditch big numbers for now
 dat$Te[dat$Te>100]<-NA
 ```
 
+We then implement a generic energy budget. We first illustrate the estimation of convective heat transfer coefficients as a function of wind speed.
 ```{r}
-#estimate convective heat transfer coefficient
-
-#Estimate using empirical relationship
+#Estimate heat transfer coefficient using empirical relationship
 dat$H_L=heat_transfer_coefficient(V=dat$Wind,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxa="cylinder")
 
 #Also illustrate estimations using a spherical approximation and a simplified version of the approximation.
@@ -166,6 +168,7 @@ H_L2= heat_transfer_coefficient_simple(V=dat$Wind,D=0.0211)
 A= sa_from_length(l=0.0211)
 ```
 
+We then implement the energy budget as follows.
 ```{r}
 #Gates calculation
 TeGates= rep(NA, nrow(dat) )
@@ -177,18 +180,13 @@ for(ind in 1:nrow(dat) ){
 dat$TeGates=TeGates-273.15
 ```
 
-```{r}
-#aggregate by day and hour
-dat.dh= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour, dat$J), FUN=mean, na.rm=TRUE))
-```
-
+We aggregate the data and plot average conditions across sites.
 ```{r}
 #aggregate by hour
 dat.h= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour), FUN=mean, na.rm=TRUE))
-```
+#aggregate by day and hour
+dat.dh= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour, dat$J), FUN=mean, na.rm=TRUE))
 
-```{r}
-library(reshape2)
 #convert to long format
 dat.s= melt(dat.h, id = c("Elev", "J","hour","psi"))
 
@@ -207,15 +205,16 @@ dat.dh$Jhr= dat.dh$J +dat.dh$hour/24
 dat.s= melt(dat.dh, id = c("Elev", "J","hour","psi","Jhr"))
 
 #plot
-dat.s= subset(dat.s, dat.s$variable %in% c("Temp","SoilTemp","SanguinipesTemp","Te","Tgrass","TeGates") )
+dat.s= subset(dat.s, dat.s$variable %in% c("Temp","SoilTemp","SanguinipesTemp","Te","Tgrass") )
+#,"TeGates"
 
-plot.t=ggplot(data=dat.s, aes(x=Jhr, y = value, color=variable))+geom_line(aes(lty=variable) )+facet_grid(Elev~1)
+plot.t= ggplot(data=dat.s, aes(x=Jhr, y = value, color=variable))+geom_line(aes(lty=variable))+facet_grid(Elev~1)
 ```
 
 ```{r}
 setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/figures/")
 
-pdf("TeTime.pdf", height = 10, width = 15)
+pdf("TeTime2.pdf", height = 10, width = 15)
 plot.t
 dev.off()
 

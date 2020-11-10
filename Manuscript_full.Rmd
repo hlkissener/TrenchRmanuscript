@@ -18,9 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Much understanding of climate change responses relies on the assumption that organismal body temperatures are equal to temporally averaged air temperatures high above the ground. However, most organisms live near the ground and acute exposure to solar radiation can substantially elevate their body temperatures. We introduce the TrenchR package, which aids in Translating Environmental Change into organismal responses (https://github.com/trenchproject/TrenchR). The package includes microclimate models to vertically scale weather station data to organismal heights. The biophysical modelling tools include both general models for heat flows and specific models to predict body temperatures for a variety of ectothermic taxa. Additional functions model and temporally partition air and soil temperatures and solar radiation. The package aims to introduce and enable microclimate and biophysical modelling to improve ecological and evolutionary forecasting and includes tutorials and well as a series of educational modules.
 
 ## Background
-Many responses of species and ecosystems to climate change are inconsistent with predictive most current models [@maguire2015modeling]. Some of these predictive shortcomings stem from omitting spatial and temporal environmental variation and how it interacts with organismal phenotypes (e.g., size, coloration) [@nadeau2017coarse; @potter2013microclimatic]. Many analyses assume that organismal body temperatures are equal to air temperate at weather station height (usually 2m). However, air temperatures near the ground where most organisms reside can be considerably warmer and absorption of solar radiation can raise body temperatures well above air temperatures, resulting in potential discrepancies of tens of degrees C [Kearney et al., 2009; Sinclair et al., 2016; Sunday et al., 2014].  Acute thermal stress events are often more relevant to the physiology and energy balance of organisms than daily, monthly, or annually aggregated environmental conditions. Yet, daily and seasonal environmental variation is often neglected [@dillon2016introduction; @dillon2016life]. We aim to help remedy these shortcomings by introducing the TrenchR package as a component of the TrEnCh project (https://trenchproject.github.io), which builds computational and visualization tools to Translate Environmental Change into organismal responses.
+Many responses of organisms and ecosystems to climate change are inconsistent with current predictive models [@maguire2015modeling]. Some of these predictive shortcomings stem from omitting spatial and temporal environmental variation and how it interacts with organismal phenotypes (e.g., size, coloration) [@nadeau2017coarse; @potter2013microclimatic]. Many analyses assume that organismal body temperatures are equal to air temperate at weather station height (usually 2m). However, air temperatures near the ground where most organisms reside can be considerably warmer and absorption of solar radiation can raise body temperatures well above air temperatures, resulting in potential discrepancies of tens of degrees C [@kearney2009potential; @sinclair2016can; @sunday2014thermal].  Acute thermal stress events are often more relevant to the physiology and energy balance of organisms than daily, monthly, or annually aggregated environmental conditions. Yet, daily and seasonal environmental variation is often neglected [@dillon2016introduction; @dillon2016life]. We aim to help remedy these shortcomings by introducing the TrenchR package as a component of the TrEnCh project (https://trenchproject.github.io), which builds computational and visualization tools to Translate Environmental Change into organismal responses.
 
-The mathematical tools for leveraging environmental data to predict organismal conditions have long lingered in books [@campbell2000introduction; @gates1980biophysical] and articles [@porter1969thermodynamic; @porter1983biophysical], but adoption of the tools has not kept pace with research on climate change responses. Adoptions of biophysical approaches are expanding with recognition of the importance of spatial and temporal environmental variation to determining climate change responses [@buckley2018leveraging; @kearney2017nichemapr].  Increasing dissemination of computational tools is facilitating adoption. The TrenchR package is intended to complement the NicheMapR package [@kearney2017nichemapr], which includes sophisticated microclimate and biophysical models. Many of the approaches are similar between the packages, but TrenchR focuses on simple functions to aid the understanding and transparency of biophysical approaches.  The TrenchR functions allow for modular use and easy adaptation to a variety of organismal and research questions.  Some energy budget calculation components of biophysical models are available in the ThermImage package (Tattersall, 2017). Although many of the TrenchR functions are general, some components of TrenchR are best suited for ectothermic animals. We have minimized inclusion of plant specific biophysical models since they are the focus of several R packages [tealeaves: (Muir, 2019); plantecophys [@duursma2015plantecophys]].
+The mathematical tools for leveraging environmental data to predict organismal conditions have long lingered in books [@campbell2000introduction; @gates1980biophysical] and articles [@porter1969thermodynamic; @porter1983biophysical], but adoption of the tools has not kept pace with research on climate change responses. Adoptions of biophysical approaches are expanding with recognition of the importance of spatial and temporal environmental variation to determining climate change responses [@buckley2018leveraging; @kearney2017nichemapr].  Increasing dissemination of computational tools is facilitating adoption. The TrenchR package is intended to complement the NicheMapR package, which includes sophisticated microclimate [@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Many of the approaches are similar between the packages, but TrenchR focuses on simple functions to aid the understanding and transparency of biophysical approaches.  The TrenchR functions allow for modular use and easy adaptation to a variety of organismal and research questions.  Some energy budget calculation components of biophysical models are also available in the ThermImage package [@tattersall2019thermimage]. Although many of the TrenchR functions are general, some components of TrenchR are best suited for ectothermic animals. We have minimized inclusion of plant specific biophysical models since they are the focus of several R packages [tealeaves: [@muir2019tealeaves]; plantecophys [@duursma2015plantecophys]].
 
 ## Methods and features
 The TrenchR package aims to promote transparency and reproducibility and we welcome contributions and corrections from users. Our package is built using the devtools methodology (https://github.com/hadley/devtools) in Github. Issues and feature requests can be contributed in Github (https://github.com/trenchproject/TrenchR/). The package is maintained and checked using Travis CI as a tool for continuous integration. 
@@ -43,11 +43,11 @@ We introduce the function in several vignettes.  A good place to start is the *A
 For additional background on microclimate and biophysical modelling, we have updated a series of educational modules entitled “Physical processes in ecosystems”.  We intend the modules to provide a more contained and accessible introduction to microclimate and biophysical modelling than that included in classic textbooks [@campbell2000introduction; @gates1980biophysical]. The modules provide less detailed coverage of many of the topics contained in the books. The series of 14 modules starts with an overview of the calculus and physics principles underlying the modelling. Thermodynamics and energy budget modelling are then introduced with detailed examples. Modules address the climate space concept, operative temperatures, biophysical models for leaves and sheep, and heat flow in soils. We have revised the modules (which originated from an NSF training grant in 1979 and lacked broad distribution) to include R code and utilization of TrenchR functions. We expanded the original series of tutorials to include introductions by Michael Kearney to the Microclim environmental data [@kearney2014microclim] and integrating the Microclim data with biophysical modelling to examine broad scale climatic limits. The modules are provided in html form and available for download as a pdf at the bookdown server (https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/). The R markdown files are available in Github at https://github.com/trenchproject/TrenchRmodules.  
 
 ## Examples
-We illustrate the use of the TrenchR package by estimating an energy budget for a *Sceloporus* lizard on June 1, 2018, in Santa Fe, New Mexico, USA (35.69, -105.944, elevation: 2121m). The example is also incorporated in the *Using energy balances to estimate body temperatures* tutorial. We first estimate the energy budget with component functions and we then use an integrated biophysical model to estimate operative environmental temperatures. We start by generating environmental inputs.
+We illustrate the use of the TrenchR package by estimating an energy budget for a *Sceloporus* lizard on June 1, 2018, in Santa Fe, New Mexico, USA (35.69, -105.944, elevation: 2121m). The example is also incorporated in the *Using energy balances to estimate body temperatures* tutorial. We first estimate the energy budget with component functions and we then use an integrated biophysical model to estimate operative environmental temperatures. We start by generating environmental inputs. See Appendix S1 for another example examining a time series of microcliamte data and applying and testing the biophysical models. 
 
 We will use the energy budget to estimate the lizard's body temperature, $T_b$, which can depart dramatically from the air temperatures due to energy exchange with the environment.  Heat is gained from absorbing solar and thermal radiation and from metabolic reactions. Heat is lost through the organism's emission of radiation and the evaporation of water. The organism exchanges heat with the surrounding air or water via convection and with the ground via conduction. The balance of these heat exchanges can be estimated and often referred to as operative environmental temperature, $T_e$ [@bakken1992measurement].
 
-Let's assume the lizard is in an unshaded location where the daily air temperature varies from a minimum of 10°C to a maximum of 25°C, the soil surface temperature varies from a minimum of 15°C to a maximum of 30°C, and the windspeed is 0.5 m/s. We assume that atmospheric transmissivity $\tau=0.7$ and albedo $\rho=0.6$
+Let's assume the lizard is in an unshaded location where a weather station at standard height (2m) indicates that the daily air temperature varies from a minimum of 10°C to a maximum of 25°C and the wind speed averages 1 m/s. The soil surface temperature varies from a minimum of 15°C to a maximum of 30°C. We assume that atmospheric transmissivity $\tau=0.7$ and albedo $\rho=0.6$
 
 ### Environmental data
 
@@ -55,10 +55,38 @@ Let us first prepare the environmental data for analysis. We will need to estima
 ```{r}
 library(TrenchR)
 
+Tb_CampbellNorman=function(T_a, T_g, S, alpha_L=0.96, epsilon=0.96, c_p=29.3, D, V){
+    
+  stopifnot(T_a>200, T_a<400, epsilon>=0.5, epsilon<=1, c_p>=0, D>0, V>=0)
+  
+  #Stefan-Boltzmann constant
+  sigma= 5.673*10^(-8) #W m^(-2) K^(-4)
+  
+  #solar and thermal radiation absorbed
+  L_a=sigma*T_a^4  # (10.7) long wave flux densities from atmosphere 
+  L_g=sigma*T_g^4  # (10.7) long wave flux densities from ground
+  F_a=0.5; F_g=0.5 #proportion of organism exposure to air and ground, respectively
+  R_abs= S+alpha_L*(F_a*L_a+F_g*L_g) # (11.14) Absorbed radiation
+  
+  #thermal radiation emitted
+  Qemit= epsilon*sigma*T_a^4
+  
+  #conductance
+  g_Ha=1.4*0.135*sqrt(V/D) # boundary conductance, factor of 1.4 to account for increased convection (Mitchell 1976), assumes forced conduction
+  g_r= 4*epsilon*sigma*T_a^3/c_p # (12.7) radiative conductance
+  
+  # operative environmental temperature
+  T_e=T_a+(R_abs-Qemit)/(c_p*(g_r+g_Ha))                       
+
+  return(T_e) 
+}
+```
+
+```{r}
 #set up input data as variables
 lat=35.69; lon= -105.944; elev=2121 #latitude and longitude (degrees) and elevation (m)
 Tmin=10; Tmax=25; Tmin_s=15; Tmax_s=30 #minimum and maximum of air and soil temperatures, respectively (C)
-V=0.5 #wind speed (m/s)
+V=1 #wind speed (m/s)
 #assumptions
 tau=0.7; rho=0.6 #atmospheric transmissivity and albedo
 Tb0=25 #initial assumption of body temperature (C)
@@ -70,31 +98,41 @@ tr= snoon-dayl/2 #time of sunrise
 ts= snoon+dayl/2 #time of sunset
 ```
 
-We can estimate hourly solar radiation as follows:
+Although measured solar radiation is preferable if available, we can estimate hourly solar radiation by discounting incoming solar radiation as it moves through the atmosphere as follows:
 ```{r}
 psi_deg= sapply(1:24, FUN=zenith_angle, doy=doy, lat=lat, lon=lon) #estimate zenith angle (degrees)
 psi_rad= degree_to_radian(psi_deg) #convert to radians
 Srad= sapply(psi_rad, FUN=estimate_radiation, doy=doy, tau=tau, elev=elev, rho=rho) #estimate radiation
 #Separate into direct, diffuse, and reflected solar radiation
-Sdir= Srad[1,]
-Sdif= Srad[2,]
-Sref= Srad[3,]
+Sdir= Srad[1,]; Sdif= Srad[2,]; Sref= Srad[3,]
 ```
 
-We can then calculate hourly air and soil temperatures. We use the sine-exponential model for air temperature and the sine model for surface temperature:
+We can then calculate hourly air and soil temperatures based on daily minimum and maximum temperatures. We select the sine-exponential model for air temperature and the sine model for surface temperature:
 ```{r}
-Ta= sapply(1:24, diurnal_temp_variation_sineexp, T_max=Tmax, T_min=Tmin, t_r=tr, t_s=ts, alpha=2.59, beta= 1.55, gamma=2.2)
-Ts= sapply(1:24, diurnal_temp_variation_sine, T_max=Tmax_s, T_min=Tmin_s)
+Ta= sapply(1:24, diurnal_temp_variation_sineexp, T_max=Tmax, T_min=Tmin, t_r=tr, t_s=ts, alpha=2.59, beta= 1.55, gamma=2.2) #air temperature (C)
+Ts= sapply(1:24, diurnal_temp_variation_sine, T_max=Tmax_s, T_min=Tmin_s) #soil temperature (C)
+```
+
+We use microclimate models to scale air temperature and wind speed from weather station height (2m) to lizard height (0.02m). We assume a surface roughness of $z_0=0.2$, which corresponds to bare sand and determines the turbulence of airflow. We implement neutral air temperature and wind speed profiles as well as an air temperature profile forced by wind speed.
+
+```{r}
+#scale air temperature to lizard height
+#z is reference height, z is organism height, z0 is surface roughness
+Ta_liz= air_temp_profile_neutral(T_r=Ta, zr=2, z0=0.2, z=0.02, T_s=Ts)
+Ta_liz2= air_temp_profile(T_r=Ta, u_r=V, zr=2, z0=0.2, z=0.02, T_s=Ts)
+
+#scale wind speed to lizard height
+V_liz= wind_speed_profile_neutral(u_r=V, zr=2, z0=0.2,z=0.02)
 ```
 
 ### Energy balance
 We will be solving the following energy balance to estimate $T_e$:
-$$Q_{net} = Q_{abs} - Q_{emit} + Q_{conv} + Q_{cond} + Q_{met} - Q_{evap},$$
-We will estimate each term on the right side of the equation in turn. Estimating $Q_{abs}$requires the surface area exposed to radiation and the solar absorptivity of the animal surface ($a$ proportion). We model a 10g Sceloporus lizard with solar absorptivity $a=0.9$ [@gates1980biophysical]. We will initially assume $T_b=T_a$ to illustrate calculations.
+$$Q_{net} = Q_{abs} - Q_{emit} - Q_{conv} - Q_{cond} - Q_{met} - Q_{evap},$$
+where $Q_{net}$ is the net energy exchange with the environment (W), $Q_{abs}$ is the solar radiation absorbed (W), $Q_{emit}$ is the net thermal radiation emitted (W), $Q_{conv}$ is energy exchange due to convection (W), $Q_{cond}$ is energy exchange due to conduction (W), $Q_{met}$ is the energy emitted due to metabolism (W), and $Q_{evap}$ is the energy emitted due to evaporative water loss (W). We will estimate each term on the right side of the equation in turn. Estimating $Q_{abs}$ requires the surface area exposed to radiation and the solar absorptivity of the animal surface ($a$ proportion). We model a 10g Sceloporus lizard with solar absorptivity $a=0.9$ [@gates1980biophysical]. We will initially assume $T_b=T_a$ to illustrate the calculations before solving for $T_b$ givne the environmental conditions.
 
 ```{r}
-mass=10
-a=0.9 #solar absorptivity
+mass=10 #mass (g)
+a=0.9 #solar absorptivity (%)
 
 #estimate surface area (m^2) from mass (g)
 A= sa_from_mass(mass, "lizard")
@@ -104,126 +142,119 @@ psa= sapply(psi_deg, prop_silhouette_area, taxa= "lizard", posture= "prostrate")
 psa[psa<0]=0
 ```
 
-We calculate the hourly radiation absorbed as follows:
+We calculate the hourly solar radiation absorbed (W) as follows:
 ```{r}
 Qabs= rep(NA, 24)
 for(hr in 1:24) Qabs[hr]= Qradiation_absorbed(a=a, A=A, psa_dir=psa[hr], psa_ref=1-psa[hr], S_dir=Sdir[hr], S_dif=Sdif[hr], a_s=rho)
 ```
 
-We estimate thermal radiation $Q_{emit}$ for the lizard outdoors. We assume the surface emissivity of lizards, $epsilon_s=0.965$ [Bartlett & Gates 1967].
+We estimate thermal radiation $Q_{emit}$ (W) for the lizard outdoors. We assume the surface emissivity of lizards, $epsilon_s=0.965$ [@barlett1967energy].
 
 ```{r}
 epsilon_s=0.965
 
 Qemit= rep(NA, 24)
-for(hr in 1:24) Qemit[hr]=Qemitted_thermal_radiation(epsilon=epsilon_s, A=A, psa_dir=psa[hr], psa_ref=1-psa[hr], T_b=Ta[hr]+273.15, T_g=Ts[hr]+273.15, T_a=Ta[hr]+273.15, enclosed=FALSE)
+for(hr in 1:24) Qemit[hr]=Qemitted_thermal_radiation(epsilon=epsilon_s, A=A, psa_dir=psa[hr], psa_ref=1-psa[hr], T_b=Ta_liz[hr]+273.15, T_g=Ts[hr]+273.15, T_a=Ta_liz[hr]+273.15, enclosed=FALSE)
 ```
 
-We next estimate convection $Q_{conv}$ and conduction $Q_{cond}$. We will estimate the lizard's heat transfer coefficient, $H_L$ using an empirical relationship for lizards (`heat_transfer_coefficient()`), but also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`).  
+We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$ (W). We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`), but also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`).  
 
 ```{r}
-#Use DRYAIR in NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
-#library(NicheMapR)
-
-#estimate Barometric pressure (pascal)
-ap= airpressure_from_elev(elev)*1000
-  
+#Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
+ap= airpressure_from_elev(elev)*1000 #estimate Barometric pressure (pascal)
+ 
 DRYAIRout= DRYAIR(db=Ta, bp=ap, alt=elev)
-K= DRYAIRout$thcond
-nu= DRYAIRout$viskin #Kinematic viscosity (m2 s-1)
+K= DRYAIRout$thcond #thermal conductivity (Wm^-2K^-1) 
+nu= DRYAIRout$viskin #kinematic viscosity (m2 s-1)
 
-svl=0.006 #SVL for sceloporus
+svl=0.006 #approximate snout vent length (m) for Sceloporus
 
-#We will use the average of K and nu across the day for simplicity and since there's not a substantial variation
+#We will use the average of K and nu across the day for simplicity and since there is not a substantial diurnal variation.
 K= mean(K)
 nu=mean(nu)
 
-#Estimate using an empirical relationship
-H_L=heat_transfer_coefficient(V=V,D=svl,K= 25.7 * 10^(-3), nu= 15.3 * 10^(-6) , taxa="lizard_surface")
+#Estimate the heat transfer coefficient using an empirical relationship for lizards
+H_L=heat_transfer_coefficient(V=V_liz,D=svl,K= 25.7 * 10^(-3), nu= 15.3 * 10^(-6) , taxa="lizard_surface")
 
 #Also illustrate estimations using a spherical approximation and a simplified version of the approximation.
-heat_transfer_coefficient_approximation(V=V,D=svl,K= 25.7 * 10^(-3), nu= 15.3 * 10^(-6), taxa="lizard")
-heat_transfer_coefficient_simple(V=0.5,D=0.05)
-
+H_L2= heat_transfer_coefficient_approximation(V=V_liz,D=svl,K= 25.7 * 10^(-3), nu= 15.3 * 10^(-6), taxa="lizard")
+H_L3= heat_transfer_coefficient_simple(V=V_liz,D=svl)
 ```
 
-We estimate convective heat exchange between the animal and surrounding air using ithe following relationship:
+We estimate convective heat exchange between the animal and surrounding air using the following relationship:
 $$Q_{conv}= ef \cdot H_L(A\cdot \mbox{proportion})(T_a-T_b),$$
-where an enhancement factor, $ef$, multiplier can be incorporated to account for increases in heat exchange resulting from air turbulance in field conditions
-
-The function is available in R assuming that 2/3 of the lizard's surface area is exchanging heat through convection. We note we currently estimate no convection since we are assuming $Tb=Ta$ for illustration purposes:
+where an enhancement factor, $ef$, multiplier can be incorporated to account for increases in heat exchange resulting from air turbulence in field conditions. We implement the function in R assuming that 2/3 of the lizard's surface area is exchanging heat through convection. We note we currently estimate no convection since we are assuming $Tb=Ta$ for illustration purposes:
 ```{r}
 Qconv= rep(NA, 24)
-for(hr in 1:24) Qconv[hr]= Qconvection(T_a= Ta[hr]+273.15,T_b= Ta[hr]+273.15,H=H_L,A=A, proportion=0.67, ef=1.3)
+for(hr in 1:24) Qconv[hr]= Qconvection(T_a= Ta_liz[hr]+273.15, T_b= Ta_liz[hr]+273.15, H=H_L, A=A, proportion=0.67, ef=1.3)
 ```
 
-We estimate conductance between the lizard and surface assuming conductance through the animal tissue is the rate limiting step as follows:
-$$Q_{cond}= A \cdot \mbox{proportion} \cdot K(T_g-T_b)/d, $$
-We conduct the estimate in R assuming that 1/3 of the lizard surface is in contact with the ground and a skin thinkness of $10^{-6}$:
+We estimate conductive heat flow (W) from the lizard to the surface assuming conductance through the animal tissue is the rate limiting step as follows:
+$$Q_{cond}= A \cdot \mbox{proportion} \cdot K(T_g-T_b)/d. $$
+We implement the estimate in R assuming that 1/3 of the lizard surface is in contact with the ground and a skin thickness $d$ of $10^{-6}$:
 ```{r}
 Qcond= rep(NA, 24)
-for(hr in 1:24) Qcond[hr]=Qconduction_animal(T_g= Ts[hr]+273.15,T_b=Ta[hr]+273.15,d=10^-6,K=K,A=A, proportion=0.33)
+for(hr in 1:24) Qcond[hr]=Qconduction_animal(T_g= Ts[hr]+273.15, T_b=Ta_liz[hr]+273.15, d=10^-6, K=K, A=A, proportion=0.33)
 ```
 
 We assume, as in generally done for lizards, that heat exchange associated with metabolism and evaporation is negligible:
 ```{r}
-Qmet= 0
-Qevap= 0
+Qmet= 0; Qevap= 0
 ```
 
-The full heat budget can be calculated as follows: 
+The full heat budget can be calculated as follows [@gates1980biophysical]: 
 ```{r}
-Qnet_Gates(Qabs=Qabs, Qemit=Qemit, Qconv=Qconv, Qcond=Qcond, Qmet=Qmet, Qevap=Qevap)
+Qnet= Qnet_Gates(Qabs=Qabs, Qemit=Qemit, Qconv=Qconv, Qcond=Qcond, Qmet=Qmet, Qevap=Qevap)
 ```
-We constructed the energy balance assuming $T_b=T_a$ for illustration. We now use a function based on the energy balance above to estimate body temperature given the environmental conditions: 
+We constructed the energy balance assuming $T_b=T_a$ for illustration. Thus, the energy balance is dominated by heat gain from contact with the warmer surface. We now use a function based on the energy balance above to estimate body temperature given the environmental conditions: 
 
 ```{r}
 Te= rep(NA, 24)
-for(hr in 1:24) Te[hr]= Tb_Gates(A=A, D=svl, psa_dir=psa[hr], psa_ref=1-psa[hr], psa_air=0.67, psa_g=0.33, T_g=Ts[hr]+273.15, T_a=Ta[hr]+273.15, Qabs=Qabs[hr], epsilon=epsilon_s, H_L=H_L, ef=1.3, K=K)
+for(hr in 1:24) Te[hr]= Tb_Gates(A=A, D=svl, psa_dir=psa[hr], psa_ref=1-psa[hr], psa_air=0.67, psa_g=0.33, T_g=Ts[hr]+273.15, T_a=Ta_liz[hr]+273.15, Qabs=Qabs[hr], epsilon=epsilon_s, H_L=H_L, ef=1.3, K=K)
 ```
 
-We also implement a similar but simplified energy balance. The energy balance omits conduction with the ground and thus underestimates temperatures, but we implement it for comparison purposes:
+We also implement a similar but simplified energy balance [@campbell2000introduction]. The energy balance omits conduction with the ground:
 ```{r}
 Te2= rep(NA, 24)
-for(hr in 1:24) Te2[hr]= Tb_CampbellNorman(T_a=Ta[hr]+273.15, S=Qabs[hr]/svl, epsilon=epsilon_s, c_p=29.3, D=svl, V=V)
-#CHECK
+
+for(hr in 1:24) Te2[hr]= Tb_CampbellNorman(T_a=Ta_liz[hr]+273.15, T_g=Ts[hr]+273.15, S=Qabs[hr]/A, alpha_L=0.96, epsilon=epsilon_s, c_p=29.3, D=svl, V=V_liz)
+#S is solar radiation flux (W m^-2), so we divide by surface area, A
 ```
 
-We additionally estimate $T_e$ using the specialized function for lizards:
+We additionally estimate $T_e$ using a specialized function for lizards [@buckley2008linking]:
 ```{r}
 Te3= rep(NA, 24)
-for(hr in 1:24) Te3[hr]= Tb_lizard(T_a=Ta[hr], T_g=Ts[hr], u=V, svl=svl*1000, m=mass, psi=psi_deg[hr], rho_S=rho, elev=elev, doy=doy, sun=TRUE, surface=TRUE, alpha_S=a, alpha_L=0.965, epsilon_s=epsilon_s, F_d=0.8, F_r=0.5, F_a=0.5, F_g=0.5)
-
-Te4= rep(NA, 24)
-for(hr in 1:24) Te4[hr]= Tb_Fei(T_a=Ta[hr]+273.15, T_g=Ts[hr]+273.15, H=Qabs[hr], lw=Qabs[hr], shade=0, m=mass, Acondfact =0.1, Agradfact =0.3)
-#CHECK
-
+for(hr in 1:24) Te3[hr]= Tb_lizard(T_a=Ta_liz[hr], T_g=Ts[hr], u=V_liz, svl=svl*1000, m=mass, psi=psi_deg[hr], rho_S=rho, elev=elev, doy=doy, sun=TRUE, surface=TRUE, alpha_S=a, alpha_L=0.965, epsilon_s=epsilon_s, F_d=0.8, F_r=0.5, F_a=0.5, F_g=0.5)
 ```
 
 ### Plot
-We next plot the diurnal trends in environmental data and the operative data.
+We next plot the diurnal trends in environmental data and predicted body temperatures. 
 
 ```{r}
 par(mar=c(5, 4, 4, 8) + 0.1)
-plot(1:24, (Te-273.15), type="l", xlab="Hour", ylab="Temperature (°C)", col="blue") #Gates
-points(1:24, Te2-273.15, type="l", col="blue", lty="dotted") #Campbell
-points(1:24, Te3, type="l", col="blue", lty="dashed") #Buckley 2008
-#points(1:24, Te4, type="l", col="red", lty="solid") #Fei et al.
-points(1:24, Ta, type="l", col="orange")
-points(1:24, Ts, type="l", col="purple")
+plot(1:24, (Te-273.15), type="l", xlab="Hour", ylab="Temperature (°C)", col="#5DC863FF", ylim=c(10,60)) #Gates
+points(1:24, Te2-273.15, type="l", col="#5DC863FF", lty="dotted") #Campbell and Norman
+points(1:24, Te3, type="l", col="#5DC863FF", lty="dashed") #Lizard, Buckley 2008
+points(1:24, Ta, type="l", col="#440154FF")
+points(1:24, Ta_liz, type="l", col="#3B528BFF")
+points(1:24, Ts, type="l", col="#21908CFF")
 
 #add additional axis with radiation
 par(new = T)
-plot(1:24, Sdir, pch=16, axes=F, xlab=NA, ylab=NA, type="l", col="green")
+plot(1:24, Sdir, pch=16, axes=F, xlab=NA, ylab=NA, type="l", col="#FDE725FF")
 axis(side = 4)
-mtext(side = 4, line = 3, 'Radiation')
+mtext(side = 4, line = 3, 'Radiation (W/m^2)')
 legend("topleft",
-       legend=c("Ta", "Ts", "Te", "Radiation"),
-       lty=1, pch=NA, col=c("orange", "purple", "blue", "green"))
+       legend=c("Ta 2m", "Ta 0.02m", "Ts", "Te", "Radiation"),
+       lty=1, pch=NA, col=c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF"))
 
 ```
 
+*Figure 1*. Predicted lizard body temperatures (Te) as a function of air temperatures (Ta) at 2m and lizard height (0.02m), surface (Ts) temperatures (°C), and solar radiation ($W/m^2$). We depict body temperatures using two general energy budgets [solid: Tb_Gates(); dotted: Tb_CampbellNorman()] and a lizard specific biophysical model [dashed: Tb_lizard()].
+
+The microclimate models indicate that air temperatures at lizard height are similar to surface temperatures (Figure 1). The biophysical models indicate that solar radiation will elevate lizard body temperatures far above air temperatures and that the lizard will face thermal stress if it is unable to seek shade (Figure 1). The three biophysical models predict different body temperatures during peak period of solar radiation because they model interactions with the ground differently and users are encouraged to review the details of each biophysical model before selection.
+
 ## Summary
-New environmental data and tools make biophysical modeling more accessible. Expand use since we realize.
+TrenchR is intended to promote understanding of how organisms interact with their environment and the consequences for physiology, energetics, behavior, and demography. Our example implementation highlights the importance of considering organismal body temperatures, rather than air temperatures, when examining thermal stress and other responses to environmental variability and change. TrenchR currently focuses on heat balances but may be expanded to include water balances. Simple functions can be combined as needed to produce comprehensive and transparent models for biophysical ecology and evolution. The resultant models are likely to be sufficiently detailed for many applications, but users are referred to NicheMapR for more detailed biophysical models [@kearney2017nichemapr; @kearney2020nichemapr]. Making classic biophysical ecology techniques more accessible will allow researchers to take advantage of rapidly accumulating data on environmental conditions and organismal traits to understand and predict ecological and evolutionary responses to variable and changing environments.
 
 ## References
