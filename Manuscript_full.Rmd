@@ -92,8 +92,7 @@ determining climate change responses [@buckley2018leveraging;
 @kearney2017nichemapr]. Increasing dissemination of computational tools
 is facilitating adoption. The TrenchR package is intended to complement
 the NicheMapR package, which includes sophisticated microclimate
-[@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Many of
-the approaches are similar between the packages, but TrenchR focuses on
+[@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Although the Fortran source code was recently released, the complexity of the functions can make it difficult to understand and modify the source code. Many of the approaches are similar between the packages, but TrenchR focuses on
 simple functions to aid the understanding and transparency of
 biophysical approaches. The TrenchR functions allow for modular use and
 easy adaptation to a variety of organisms and research questions. Some
@@ -225,7 +224,7 @@ solar and thermal radiation and from metabolic reactions. Heat is lost
 through the organism's emission of radiation and the evaporation of
 water. The organism exchanges heat with the surrounding air or water via
 convection and with the ground via conduction. The balance of these heat
-exchanges can be estimated and often referred to as operative
+exchanges (omitting metabolism and evaporation, which are often negligible for ectotherms) can be estimated and often referred to as operative
 environmental temperature, $T_e$ [@bakken1992measurement].
 
 Let us assume the lizard is in an unshaded location where a weather
@@ -369,6 +368,8 @@ We calculate the hourly solar radiation absorbed (W) as follows:
 ```{r}
 Qabs= rep(NA, 24)
 for(hr in 1:24) Qabs[hr]= Qradiation_absorbed(a=a, A=A, psa_dir=psa[hr], psa_ref=1-psa[hr], S_dir=Sdir[hr], S_dif=Sdif[hr], a_s=rho)
+#where 
+
 ```
 
 We estimate thermal radiation $Q_{emit}$ (W) for the lizard outdoors. We
@@ -380,6 +381,8 @@ epsilon_s=0.965
 
 Qemit= rep(NA, 24)
 for(hr in 1:24) Qemit[hr]=Qemitted_thermal_radiation(epsilon=epsilon_s, A=A, psa_dir=psa[hr], psa_ref=1-psa[hr], T_b=Ta_liz[hr]+273.15, T_g=Ts[hr]+273.15, T_a=Ta_liz[hr]+273.15, enclosed=FALSE)
+
+#where psa_dir and psi_ref are the proportions of surface area exposed to direct and reflected solar radiation, respectively.
 ```
 
 We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$
@@ -398,7 +401,7 @@ DRYAIRout= DRYAIR(db=Ta, bp=ap, alt=elev)
 K= DRYAIRout$thcond #thermal conductivity (Wm^-2K^-1) 
 nu= DRYAIRout$viskin #kinematic viscosity (m2 s-1)
 
-svl=0.006 #approximate snout vent length (m) for Sceloporus
+svl=0.006 #approximate snout vent length (m) for Sceloporus, used as the characteristic dimension for heat transfer
 
 #We will use the average of K and nu across the day for simplicity and since there is not a substantial diurnal variation.
 K= mean(K)
@@ -418,7 +421,7 @@ $$Q_{conv}= ef \cdot H_L(A\cdot \mbox{proportion})(T_a-T_b),$$ where an
 enhancement factor, $ef$, multiplier can be incorporated to account for
 increases in heat exchange resulting from air turbulence in field
 conditions. We implement the function in R assuming that 2/3 of the
-lizard's surface area is exchanging heat through convection. We note we
+lizard's surface area is exchanging heat through convection. We
 currently estimate no convection since we are assuming $Tb=Ta$ for
 illustration purposes:
 
@@ -438,7 +441,7 @@ Qcond= rep(NA, 24)
 for(hr in 1:24) Qcond[hr]=Qconduction_animal(T_g= Ts[hr]+273.15, T_b=Ta_liz[hr]+273.15, d=10^-6, K=K, A=A, proportion=0.33)
 ```
 
-We assume, as in generally done for lizards, that heat exchange
+We assume, as is generally done for lizards, that heat exchange
 associated with metabolism and evaporation is negligible:
 
 ```{r}
@@ -479,6 +482,7 @@ We additionally estimate $T_e$ using a specialized function for lizards
 ```{r}
 Te3= rep(NA, 24)
 for(hr in 1:24) Te3[hr]= Tb_lizard(T_a=Ta_liz[hr], T_g=Ts[hr], u=V_liz, svl=svl*1000, m=mass, psi=psi_deg[hr], rho_S=rho, elev=elev, doy=doy, sun=TRUE, surface=TRUE, alpha_S=a, alpha_L=0.965, epsilon_s=epsilon_s, F_d=0.8, F_r=0.5, F_a=0.5, F_g=0.5)
+#where F_d, F_r, F_a, and F_g are the view factors between the surface of the lizard and diffuse and reflected solar radiation and atmospheric and ground thermal radiation, respectively. 
 ```
 
 The microclimate models indicate that air temperatures at lizard height
@@ -512,8 +516,8 @@ legend("topleft",
 
 ```
 
-* **Figure 1**. Body temperatures (Te) are predicted to drastically exceed air temperature when lizards are exposed to high levels of solar radiation. Air temperatures (Ta, °C) at lizard height (0.02m) are predicted to exceed air temperatures at 2m and to be similar to surface temperatures (Ts). We estimate body temperatures using two general energy budgets [solid: Tb_Gates();
-dotted: Tb_CampbellNorman()] and a lizard specific biophysical model [dashed: Tb_lizard()] that differ in how they model heat exchanges.*
+**Figure 1**. Body temperatures (Te) are predicted to drastically exceed air temperature when lizards are exposed to high levels of solar radiation. Air temperatures (Ta, °C) at lizard height (0.02m) are predicted to exceed air temperatures at 2m and to be similar to surface temperatures (Ts). We estimate body temperatures using two general energy budgets [solid: Tb_Gates();
+dotted: Tb_CampbellNorman()] and a lizard specific biophysical model [dashed: Tb_lizard()] that differ in how they model heat exchanges.
 
 ## Conclusions
 

@@ -21,7 +21,7 @@ library(reshape)
 ```
 
 # APPENDIX S1
-We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. We first use a times series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. We then use a time series of air and surface temperature, windspeed, and solar radiation collected at a single height to implement and test a biophysical model for grasshoppers.
+We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. We first use a time series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. We then use a time series of air and surface temperatures, wind speeds, and solar radiation collected at a single height to implement a biophysical model for grasshoppers and compare estimates to observations.
 
 # Microclimate models
 ```{r, include=FALSE}
@@ -42,14 +42,14 @@ names(C1.hr)[1]="hour"
 C1.hr= as.matrix(C1.hr)
 ```
 
-We first examine how temperature and windspeed profiles can be used to scale conditions to the heights of organisms. We first use wind speed variation across hours and heights to estimate surface roughness.
+We first examine how temperature and wind speed profiles can be used to scale conditions to the heights of organisms. We first use wind speed variation across hours and heights to estimate surface roughness.
 ```{r}
 #estimate surface roughness based on wind velocity (m/s) at a vector of reference heights, zr (m)
 z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.0,1.5))
 
 ```
 
-We then calculate the temperature and wind speed profiles for a given hour using multiple functions in TrenchR.
+We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR.
 ```{r}
 #subset to day and hour
 C1.sub= subset(C1.dayhr, C1.dayhr$day==10)
@@ -78,7 +78,7 @@ u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"],
 u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
 ```
 
-The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground. Profiles can be fit as a single smooth function or segments.
+The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground (Figure 1). Profiles can be fit as a single smooth function or segments.
 ```{r, echo=FALSE}
 #replace infinity with N
 t.seq1[which(!is.finite(t.seq1))]=NA
@@ -93,6 +93,8 @@ plot(u.seq1, z.seq, type = "l", xlab = "windspeed (m/s)", ylab = "z (height abov
 points(u.seq3, z.seq, type = "l", lty="dotted")
 points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 ```
+
+*Figure 1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: air_temp_profile_neutral(); dashed: air_temp_profile()] and segmented estimation [dotted: air_temp_profile_segment()].*
 
 # Biophysical models
 ```{r, include=FALSE}
@@ -132,37 +134,43 @@ dataug= subset(dat, dat.dt$mon==7)
 dat= subset(dataug, dataug$Rad>5)
 ```
 
-We next illustrate estimating operative environmental temperatures, the estimated body temperatures for grasshoppers in the specified environments. We first read and process time series of environmental data. We estimate the zenith angle, the angle between the sun's rays and the vertical, across Julian days and hours.
+We next illustrate quantifying operative environmental temperatures, which are estimated body temperatures for grasshoppers in the specified environments. We first read and process time series of environmental data. We estimate the zenith angle, the angle between the sun's rays and the vertical, across Julian days and hours.
 ```{r}
 #Calculate zenith
 dat$psi= zenith_angle(dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
 
 ```
 
-We scale the air temperature data from 0.5m to grasshopper height (0.001m).
+We scale the air temperature and wind speed from a reference height of 0.5m to grasshopper height (0.001m).
 ```{r}
 z<-0.001 #specify distance from ground 
 
 #scale temperature T_r from reference height zr=0.5m to grasshopper height based on windspeed u_r, surface temperature T_s, and surface roughness z0.
 dat$Tgrass <- air_temp_profile(T_r=dat$Temp, u_r=dat$Wind, zr=0.5, z0=0.02, z=z, T_s=dat$SoilTemp)
+
+#scale wind to grasshopper height
+dat$Ugrass= wind_speed_profile_neutral(u_r=dat$Wind, zr=0.5, z0=0.02,z=z)
 ```
 
 ```{r, include=FALSE}
 #cut nas
-dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour","psi","Tgrass")]
+dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour","psi","Tgrass","Ugrass")]
 dat= na.omit(dat)
 ```
 
 We then use biophysical models to estimate body temperatures based on air and surface temperatures, wind speed, and solar radiation. We first use a biophysical model specifically configured for grasshoppers.
 ```{r, warning=FALSE}
+
 ##Calculate operative temperature, Te
-dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Wind, H=dat$Rad, K_t=0.7, psi=dat$psi, L=0.0211, Acondfact=0.01)
+dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, L=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
 
 #T_a	and T_g are air and surface temperatures (C), respectively; u	is wind speed (m/s); 
 #H is total (direct + diffuse) solar radiation flux (W/m^2); 
 #K_t	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere;
 #psi is solar zenith angle (degrees); L	is grasshopper length (m);
-#Acondfact is the proportion of the grasshopper surface area in contact with the ground.
+#Acondfact is the proportion of the grasshopper surface area in contact with the ground;
+#abs is absorptivity of grasshopper to solar radiation (proportion);
+#r_g is substrate solar reflectivity (proportion).
 ```
 
 ```{r, include=FALSE}
@@ -175,25 +183,26 @@ dat$Te[dat$Te>100]<-NA
 We then implement a generic energy budget. We first illustrate the estimation of convective heat transfer coefficients as a function of wind speed.
 ```{r}
 #Estimate heat transfer coefficient using empirical relationship
-dat$H_L=heat_transfer_coefficient(V=dat$Wind,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxa="cylinder")
+dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxa="cylinder")
 #where V is	air velocity (m/s); D is the characteristic dimension (m);
 #K is the thermal conductivity of air (W m^-1 K^-1);
 #nu is the kinematic viscosity of air (m^2 s^-1)
 
 #Also estimate using a spherical approximation and a simplified version of the approximation.
-H_L1= heat_transfer_coefficient_approximation(V=dat$Wind,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxa="flyinginsect")
-H_L2= heat_transfer_coefficient_simple(V=dat$Wind,D=0.0211)
+H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxa="flyinginsect")
+H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211)
 
 #surface area from length(m)
 A= sa_from_length(l=0.0211)
 ```
 
 We then implement the energy budget as follows.
-```{r, results = FALSE}
+```{r, results = FALSE, warning=FALSE}
 TeGates= rep(NA, nrow(dat) )
 
 for(ind in 1:nrow(dat) ){
-  out= try(Tb_Gates(A=A, D=0.0211/3, psa_dir=0.66, psa_ref=1-0.66, psa_air=0.99, psa_g=0.01, T_g=dat$SoilTemp[ind]+273, T_a=dat$Tgrass[ind]+273, Qabs=A*dat$Rad[ind], epsilon=0.95, H_L=dat$H_L[ind], ef=1.3, K=0.15), silent=TRUE)
+
+  out= try(Tb_Gates(A=A, D=0.0211/3, psa_dir=0.5, psa_ref=1-0.5, psa_air=1, psa_g=0.0, T_g=dat$SoilTemp[ind]+273, T_a=dat$Tgrass[ind]+273, Qabs=A*0.66*dat$Rad[ind], epsilon=0.95, H_L=dat$H_L[ind], ef=1.3, K=0.15), silent=TRUE)
   if(is.numeric(out))TeGates[ind]=out
 }
 #where psa_dir, psa_ref, psa_air, psa_g are the proportions surface area exposed to direct radiation from the sky (or enclosure), reflected radiation from the ground, and air, and in contact with the ground, respectively;
@@ -204,9 +213,12 @@ for(ind in 1:nrow(dat) ){
 #K is thermal conductivity. 
 ```
 
-We aggregate the data and plot average conditions across sites.
+We aggregate the data and plot average conditions across sites (Figure 2). The simplifying assumptions in the biophysical model implementation reduce alignment with the observed temperatures of grasshoppers, but the divergence of grasshopper temperatures from air temperatures at 2m and, to a lesser extent, air temperatures at grasshopper height demonstrate the importance of implementing biophysical models.
 ```{r, echo=FALSE, warning=FALSE}
 dat$TeGates=TeGates-273.15
+
+#drop NAs
+dat= dat[which(!is.na(dat$TeGates)),]
 
 #aggregate by hour
 dat.h= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour), FUN=mean, na.rm=TRUE))
@@ -236,9 +248,11 @@ dat.pl$elev.lab= paste(dat.pl$Elev,"m", sep=" ")
 dat.pl$Ttype="input"
 dat.pl$Ttype[which(dat.pl$variable %in% c("Te","Te Gates","Te observed") )]="estimates"
 
-ggplot(data=dat.pl, aes(x=hour, y = value, color=variable))+geom_line(aes(lty=variable) )+facet_wrap(~elev.lab)+theme_classic()+ theme(legend.position="bottom")
+ggplot(data=dat.pl, aes(x=hour, y = value, color=variable))+geom_line(aes(lty=variable) )+facet_wrap(~elev.lab)+theme_classic()+ theme(legend.position="bottom")+ylim(15,65)
 
 ```
+
+*Figure 2. Diurnal temperature variation averaged across days in August varies across the elevations of CO sites (panels) and the type of temperature (C). Microclimate models indicate that the air temperatures experienced by grasshoppers near the ground (Ta grasshopper height) is generally above air temperatures (Ta) and close to surface temperatures (Ts). Body temperatures estimated by a grasshopper specific biophysical model (Te) are fairly similar to but sometimes less than the body temperatures of a physical grasshopper model implanted with a thermistor (Te observed). The general biophysical models that makes simplifying assumptions (Te Gates) tends to overestimate body temperatures.*
 
 ```{r, include=FALSE}
 #plot by date time
