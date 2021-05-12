@@ -31,17 +31,18 @@ John^1^, Ofir Levy^2^, Abby Meyer^1^, Yutaro Sakairi^1^,...
 Corresponding Author: Lauren Buckley,
 [lbuckley\@uw.edu](mailto:lbuckley@uw.edu){.email}
 
-Running head: TrenchR microclimate and biophysical models 
+Running head: TrenchR microclimate and biophysical models
 
 Type: applications
 
 ## Abstract
 
-1.  Much understanding of responses to climate change and variability relies on the
-    assumption that organismal body temperatures are equal to temporally
-    averaged air temperatures high above the ground. However, most
-    organisms live near the ground and acute exposure to solar radiation and thermal extremes
-    can substantially elevate their body temperatures.
+1.  Much understanding of responses to climate change and variability
+    relies on the assumption that organismal body temperatures are equal
+    to temporally averaged air temperatures high above the ground.
+    However, most organisms live near the ground and acute exposure to
+    solar radiation and thermal extremes can substantially elevate their
+    body temperatures.
 2.  We introduce the TrenchR package, which aids in Translating
     Environmental Change into organismal responses. The package includes
     microclimate models to vertically scale weather station data to
@@ -49,11 +50,15 @@ Type: applications
     general models for heat flows and specific models to predict body
     temperatures for a variety of ectothermic taxa. Additional functions
     model and temporally partition air and soil temperatures and solar
-    radiation. We offer utility functions to aid in estimating the organismal and environonmental parameters needed for biophysical ecology.
-3.  TrenchR focuses on relatively simple and modular functions so users can create transparent and flexible biophysical models.
+    radiation. We offer utility functions to aid in estimating the
+    organismal and environonmental parameters needed for biophysical
+    ecology.
+3.  TrenchR focuses on relatively simple and modular functions so users
+    can create transparent and flexible biophysical models.
 4.  The package aims to introduce and enable microclimate and
     biophysical modelling to improve ecological and evolutionary
-    forecasting. To further this aim, we offer a series of educational modules to introduce the field of biophysical ecology.
+    forecasting. To further this aim, we offer a series of educational
+    modules to introduce the field of biophysical ecology.
 
 **Keywords**: biophysical, climate change, ecotherm, energy budget,
 mechanistic models, microclimate, scaling, temperature
@@ -71,15 +76,19 @@ temperatures near the ground where most organisms reside can be
 considerably warmer and absorption of solar radiation can raise body
 temperatures well above air temperatures, resulting in potential
 discrepancies of tens of degrees C [@sinclair2016; @sunday2014;
-@kearney2009]. Applications are increasingly demonstrating the importance of accounting for microclimate variation [@bramer2018advances; @butikofer2020problem; @lembrechts2019comparing].  Acute thermal stress events are often more relevant to
-the physiology and energy balance of organisms than daily, monthly, or
-annually aggregated environmental conditions. Yet, daily and seasonal
+@kearney2009]. Applications are increasingly demonstrating the
+importance of accounting for microclimate variation
+[@bramer2018advances; @butikofer2020problem; @lembrechts2019comparing].
+Acute thermal stress events are often more relevant to the physiology
+and energy balance of organisms than daily, monthly, or annually
+aggregated environmental conditions. Yet, daily and seasonal
 environmental variation is often neglected [@dillon2016introduction;
 @dillon2016life]. We aim to help remedy these shortcomings by
-introducing the TrenchR package (<https://github.com/trenchproject/TrenchR>) as a component of the TrEnCh project
-(<https:www.trenchproject.com>), which builds computational and
-visualization tools to Translate Environmental Change into organismal
-responses.
+introducing the TrenchR package
+(<https://github.com/trenchproject/TrenchR>) as a component of the
+TrEnCh project (<https:www.trenchproject.com>), which builds
+computational and visualization tools to Translate Environmental Change
+into organismal responses.
 
 The mathematical tools for leveraging environmental data to predict
 organismal conditions have long lingered in books
@@ -92,17 +101,23 @@ determining climate change responses [@buckley2018leveraging;
 @kearney2017nichemapr]. Increasing dissemination of computational tools
 is facilitating adoption. The TrenchR package is intended to complement
 the NicheMapR package, which includes sophisticated microclimate
-[@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Although the Fortran source code was recently released, the complexity of the functions can make it difficult to understand and modify the source code. Many of the approaches are similar between the packages, but TrenchR focuses on
-simple functions to aid the understanding and transparency of
-biophysical approaches. The TrenchR functions allow for modular use and
-easy adaptation to a variety of organisms and research questions. Some
-energy budget calculation components of biophysical models are also
-available in the ThermImage package [@tattersall2017]. Although many of
-the TrenchR functions are general, some components of TrenchR are best
-suited for ectothermic animals. We have limited inclusion of plant
-specific biophysical models since they are the focus of several R
-packages [tealeaves: [@muir2019tea]; plantecophys:
-[@duursma2015plantecophys]].
+[@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models.
+Although the Fortran source code was recently released, the complexity
+of the functions can make it difficult to understand and modify the
+source code. Many of the approaches are similar between the packages,
+but TrenchR focuses on simple functions to aid the understanding and
+transparency of biophysical approaches. The TrenchR functions allow for
+modular use and easy adaptation to a variety of organisms and research
+questions. Although many of the TrenchR functions are general, some
+components of TrenchR are best suited for ectothermic animals.
+
+We have limited inclusion of plant specific biophysical models since
+they are the focus of several R packages [tealeaves: [@muir2019tea];
+plantecophys: [@duursma2015plantecophys]]. Some energy budget
+calculation components of biophysical models are also available in the
+ThermImage package [@tattersall2017]. Microclimate models, with an
+emphasis on describing spatial variation, are also available in the
+Microclima package [@maclean2019microclima].
 
 ## Methods and features
 
@@ -166,8 +181,8 @@ evaporation [@bakken1992measurement].
 
 ### Vignettes and introductory modules
 
-We introduce the functions in several vignettes. A good place to start is
-the *Allometry and conversions* vignette, which provides tools for
+We introduce the functions in several vignettes. A good place to start
+is the *Allometry and conversions* vignette, which provides tools for
 preparing data such as estimating additional dimensions of organisms
 from measured dimensions. The *Estimating microclimates* vignette
 provides resources for estimating the environmental conditions
@@ -217,14 +232,15 @@ environmental inputs. See Appendix S1 for another example examining a
 time series of microclimate data and applying and testing the
 biophysical models.
 
-We will use the energy budget to estimate body temperature,
-$T_b$, which can depart dramatically from the air temperatures due to
-energy exchange with the environment. Heat is gained from absorbing
-solar and thermal radiation and from metabolic reactions. Heat is lost
-through the organism's emission of radiation and the evaporation of
-water. The organism exchanges heat with the surrounding air or water via
-convection and with the ground via conduction. The balance of these heat
-exchanges (omitting metabolism and evaporation, which are often negligible for ectotherms) can be estimated and often referred to as operative
+We will use the energy budget to estimate body temperature, $T_b$, which
+can depart dramatically from the air temperatures due to energy exchange
+with the environment. Heat is gained from absorbing solar and thermal
+radiation and from metabolic reactions. Heat is lost through the
+organism's emission of radiation and the evaporation of water. The
+organism exchanges heat with the surrounding air or water via convection
+and with the ground via conduction. The balance of these heat exchanges
+(omitting metabolism and evaporation, which are often negligible for
+ectotherms) can be estimated and often referred to as operative
 environmental temperature, $T_e$ [@bakken1992measurement].
 
 Let us assume the lizard is in an unshaded location where a weather
@@ -236,8 +252,8 @@ $\tau=0.7$ and albedo $\rho=0.6$
 
 ### Environmental data
 
-We first prepare the environmental data for analysis. We will need
-to estimate hourly air and soil temperatures and radiation. We start by
+We first prepare the environmental data for analysis. We will need to
+estimate hourly air and soil temperatures and radiation. We start by
 estimating the day of year and the timing of sunrise and sunset:
 
 ```{r, echo=FALSE}
@@ -516,8 +532,14 @@ legend("topleft",
 
 ```
 
-**Figure 1**. Body temperatures (Te) are predicted to drastically exceed air temperature when lizards are exposed to high levels of solar radiation. Air temperatures (Ta, °C) at lizard height (0.02m) are predicted to exceed air temperatures at 2m and to be similar to surface temperatures (Ts). We estimate body temperatures using two general energy budgets [solid: Tb_Gates();
-dotted: Tb_CampbellNorman()] and a lizard specific biophysical model [dashed: Tb_lizard()] that differ in how they model heat exchanges.
+**Figure 1**. Body temperatures (Te) are predicted to drastically exceed
+air temperature when lizards are exposed to high levels of solar
+radiation. Air temperatures (Ta, °C) at lizard height (0.02m) are
+predicted to exceed air temperatures at 2m and to be similar to surface
+temperatures (Ts). We estimate body temperatures using two general
+energy budgets [solid: Tb_Gates(); dotted: Tb_CampbellNorman()] and a
+lizard specific biophysical model [dashed: Tb_lizard()] that differ in
+how they model heat exchanges.
 
 ## Conclusions
 
@@ -532,11 +554,16 @@ can be combined as needed to produce comprehensive and transparent
 models for biophysical ecology and evolution. The resultant models are
 likely to be sufficiently detailed for many applications, but users are
 referred to NicheMapR for more detailed biophysical models
-[@kearney2017nichemapr; @kearney2020nichemapr]. We focus on models that predict equilibrium conditions for simplicity. Such models generally do not present computational challenges so our models are not optimized for computational efficiency. Making classic
-biophysical ecology techniques more accessible will allow researchers to
-take advantage of rapidly accumulating data on environmental conditions
-and organismal traits to understand and predict ecological and
-evolutionary responses. Considering how organisms experience their environment is central to understanding responses to variable and changing environments [@suggitt2018extinction].
+[@kearney2017nichemapr; @kearney2020nichemapr]. We focus on models that
+predict equilibrium conditions for simplicity. Such models generally do
+not present computational challenges so our models are not optimized for
+computational efficiency. Making classic biophysical ecology techniques
+more accessible will allow researchers to take advantage of rapidly
+accumulating data on environmental conditions and organismal traits to
+understand and predict ecological and evolutionary responses.
+Considering how organisms experience their environment is central to
+understanding responses to variable and changing environments
+[@suggitt2018extinction].
 
 ## Acknowledgements
 
