@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 -   Continuous line and page numbering throughout
 
 Lauren B. Buckley^1^, Bryan Briones Ortiz^1^, Isaac Caruso^1^, Aji
-John^1^, Ofir Levy^2^, Abby Meyer^1^, Yutaro Sakairi^1^
+John^1^, Ofir Levy^2^, Abigail Meyer^1^, Yutaro Sakairi^1^
 
 1.  Department of Biology, University of Washington, Seattle, WA
     98195-1800, USA
