@@ -1,6 +1,6 @@
 ---
 title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
-author: "Lauren B. Buckley, Bryan Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail Meyer, Yutaro Sakairi,..."
+author: "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, and Yutaro Sakairi"
 output:
   html_document: default
   word_document: default
@@ -21,13 +21,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 -   Continuous line and page numbering throughout
 
-Lauren B. Buckley^1^, Bryan Briones Ortiz^1^, Isaac Caruso^1^, Aji
-John^1^, Ofir Levy^2^, Abigail Meyer^1^, Yutaro Sakairi^1^
+Lauren B. Buckley^1^, Bryan A. Briones Ortiz^1^, Isaac Caruso^1^, Aji
+John^1^, Ofir Levy^2^, Abigail V. Meyer^1^, Eric A. Riddell^3^, Yutaro Sakairi^1^
 
 1.  Department of Biology, University of Washington, Seattle, WA
     98195-1800, USA
-2.  
-
+2.  School of Zoology, Tel Aviv University, Tel Aviv, Israel
+3.  Department of Ecology, Evolution, and Organismal Biology, Iowa State University, 
+Ames, IA 50011-4009, USA
 Corresponding Author: Lauren Buckley,
 [lbuckley\@uw.edu](mailto:lbuckley@uw.edu){.email}
 
@@ -41,7 +42,7 @@ Type: applications
     relies on the assumption that organismal body temperatures are equal
     to temporally averaged air temperatures high above the ground.
     However, most organisms live near the ground and acute exposure to
-    solar radiation and thermal extremes can substantially elevate their
+    solar and thermal radiation and thermal extremes can substantially elevate their
     body temperatures.
 2.  We introduce the TrenchR package, which aids in Translating
     Environmental Change into organismal responses. The package includes
@@ -54,10 +55,10 @@ Type: applications
     organismal and environonmental parameters needed for biophysical
     ecology.
 3.  TrenchR focuses on simple and modular functions so users
-    can create transparent and flexible biophysical models.
+    can create transparent and flexible models for biophysical applications.
 4.  The package aims to introduce and enable microclimate and
     biophysical modelling to improve ecological and evolutionary
-    forecasting. To further this aim, we offer a series of educational
+    forecasting. We further this aim through a series of educational
     modules to introduce the field of biophysical ecology.
 
 **Keywords**: biophysical, climate change, ecotherm, energy budget,
@@ -65,7 +66,7 @@ mechanistic models, microclimate, scaling, temperature
 
 ## Introduction
 
-Many responses of organisms and ecosystems to climate change are
+Responses of organisms and ecosystems to climate change are heterogeneous and thus
 inconsistent with current predictive models [@maguire2015modeling]. Some
 of these predictive shortcomings stem from omitting spatial and temporal
 environmental variation and how it interacts with organismal phenotypes
@@ -73,7 +74,7 @@ environmental variation and how it interacts with organismal phenotypes
 Many analyses assume that organismal body temperatures are equal to air
 temperatures at weather station height (usually 2 meters). However, air
 temperatures near the ground where most organisms reside can be
-considerably warmer, and absorption of solar radiation can raise body
+considerably warmer, and absorption of solar and thermal radiation can raise body
 temperatures well above air temperatures, resulting in potential
 discrepancies of tens of degrees Celsius [@sinclair2016; @sunday2014;
 @kearney2009]. Applications are increasingly demonstrating the
@@ -81,7 +82,7 @@ importance of accounting for microclimate variation
 [@bramer2018advances; @butikofer2020problem; @lembrechts2019comparing].
 Acute thermal stress events are often more relevant to the physiology
 and energy balance of organisms than daily, monthly, or annually
-averaged (*Abby: changed from aggregated*) environmental conditions. Yet, daily and seasonal
+averaged environmental conditions. Yet, daily and seasonal
 environmental variation is often neglected [@dillon2016introduction;
 @dillon2016life]. We aim to help remedy these shortcomings by
 introducing the TrenchR package
@@ -99,6 +100,7 @@ Adoption of biophysical approaches is expanding with recognition of
 the importance of spatial and temporal environmental variation to
 determining climate change responses [@buckley2018leveraging;
 @kearney2017nichemapr] and the increased dissemination of computational tools. 
+
 The TrenchR package is intended to complement
 the NicheMapR package, which includes sophisticated microclimate
 [@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models.
@@ -109,9 +111,7 @@ but TrenchR provides simple functions to aid the understanding and
 transparency of biophysical approaches. The TrenchR functions are
 modular and easy adapt to a variety of organisms and research
 questions. Although many of the TrenchR functions are general, some
-components of TrenchR are best suited for ectothermic animals.
-
-We have limited inclusion of plant specific biophysical models since
+components of TrenchR are best suited for ectothermic animals. We have limited inclusion of plant specific biophysical models since
 they are the focus of several R packages [tealeaves: [@muir2019tea];
 plantecophys: [@duursma2015plantecophys]]. Some energy budget
 calculation components of biophysical models are also available in the
@@ -121,15 +121,12 @@ Microclima package [@maclean2019microclima].
 
 ## Methods and features
 
-The TrenchR package aims to promote transparency and reproducibility.
+The TrenchR package (<http://trenchproject.github.io/TrenchR/>) aims to promote transparency and reproducibility.
 We welcome contributions and corrections from users. Our package is
 built using the devtools methodology
 (<https://github.com/hadley/devtools>) in Github. Issues and feature
 requests can be contributed in Github
-(<https://github.com/trenchproject/TrenchR/>). The package is maintained
-and checked using Travis CI as a tool for continuous integration.
-
-(*Abby: maybe add the link to the reference website? trenchproject.github.io/TrenchR/*)
+(<https://github.com/trenchproject/TrenchR/>). 
 
 Functions were adapted from biophysical ecology textbooks
 [@campbell2000introduction; @gates1980biophysical] and research
@@ -147,7 +144,7 @@ TrenchR functions are organized into the following categories:
 
 **Utility functions** allow estimating environmental metrics that form
 the basis of microclimate and biophysical models (e.g., zenith and
-declination angles), facilitate modeling diurnal temperature variation,
+declination angles, which describe the angles of incident sunlight), facilitate modeling diurnal temperature variation,
 and estimate biologically relevant aggregate metrics such as degree days
 available for development.
 
@@ -161,11 +158,11 @@ reflected).
 **General biophysical functions** provide generalized models of heat
 exchanges between organisms and their environment so that users can
 build custom biophysical models. The functions allow implementing an
-energy balance of the following components of heat exchange between
+energy balance including the following components of heat exchange between
 organisms and their environment: *radiative heat exchanges* of solar and
 thermal radiation; *convective heat exchanges* between organisms and
 their surrounding fluid (air or water) driven by fluid flow; 
-*conductive heat exchanges* between organisms and the ground due to physical
+*conductive heat exchanges* between organisms and solid surfaces (generally the ground) due to physical
 contact; and *evaporative heat exchanges* associated with organisms'
 evaporative water loss. Additional functions aggregate these forms of
 heat exchange into energy balances and to use the energy balances to
@@ -195,7 +192,7 @@ Finally, the core biophysical modelling functions are described in a
 tutorial on *Using energy balances to estimate body temperatures*.
 Components of an energy budget can be estimated using individual
 functions and then body temperatures can be solved for using either a
-generic energy balance or taxa specific biophysical models.
+generic energy balance or taxa specific biophysical models. We additionally offer a *List of symbols* used in equations.
 
 For additional background on microclimate and biophysical modelling, we
 have updated a series of educational modules entitled 
@@ -220,8 +217,7 @@ the bookdown server
 (<https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/>). The
 R markdown files are available in Github (<https://github.com/trenchproject/TrenchRmodules>).
 
-## Implementation
-(*Abby: I might title this "Example Application" or "Demonstration of Use" or other. I would assume implementation to mean how you implemented the functions overall*)
+## Example Application
 
 We illustrate the use of the TrenchR package by estimating an energy
 budget for a *Sceloporus* lizard on June 1, 2020 in Santa Fe, New
@@ -243,11 +239,10 @@ organism exchanges heat with the surrounding air or water via convection
 and with the ground via conduction. The balance of these heat exchanges
 (omitting metabolism and evaporation, which are often negligible for
 ectotherms) can be estimated and often referred to as operative
-environmental temperature, $T_e$ [@bakken1992measurement].
-(*Abby: I'm confused at where the distinction is made between Tb and Te, for example if the energy exchanges are part of Tb or Te or both.*)
+environmental temperature, $T_e$ [@bakken1992measurement]. $T_e$ is an estimate of $T_b$ and the package functions refer to $T_b$ for simplicity.
 
 Let us assume the lizard is in an unshaded location where a weather
-station at standard height (2 meters) reports the daily air temperature
+station at standard height (2 meters) reports that the daily air temperature
 varies from a minimum of 10°C to a maximum of 25°C and the wind speed
 averages 1 m/s. The soil surface temperature varies from a minimum of
 15°C to a maximum of 30°C. We assume that atmospheric transmissivity
@@ -255,8 +250,8 @@ $\tau = 0.7$ and albedo $\rho = 0.6$
 
 ### Environmental data
 
-We first prepare the environmental data for analysis. We estimate 
-hourly air and soil temperatures and radiation. We start by
+We first prepare the environmental data for analysis. We will estimate 
+hourly air and soil temperatures and radiation usinf a function describing diurnal temperature variation. We start by
 estimating the day of year and the timing of sunrise and sunset:
 
 ```{r, echo=FALSE}
@@ -316,7 +311,7 @@ ts = snoon + dayl / 2 # Time of sunset
 
 Although measured solar radiation is preferable if available, we can
 estimate hourly solar radiation by discounting incoming solar radiation
-as it moves through the atmosphere as follows:
+as it moves through the atmosphere as follows. The function partitions radiation into direct, diffuse, and reflected components:
 
 ```{r}
 # Estimate zenith angle (degrees)
@@ -344,8 +339,8 @@ Ts = sapply(1:24, diurnal_temp_variation_sine, T_max = Tmax_s, T_min = Tmin_s)
 ```
 
 We use microclimate models to scale air temperature and wind speed from
-weather station height (2 meters) to lizard height (0.02 meters). We assume a
-surface roughness of $z_0 = 0.2$ (*Abby: units?*), which corresponds to bare sand and
+weather station height (2m) to lizard height (0.02m). We assume a
+surface roughness of $z_0 = 0.2$ m, which corresponds to bare sand and
 determines the turbulence of airflow. We implement a neutral air
 temperature profile, an air temperature
 profile forced by wind speed, and a neutral wind speed profile.
@@ -384,8 +379,8 @@ mass = 10 # Mass (g)
 a = 0.9 # Solar absorptivity (proportion)
 
 # Estimate surface area and sihouette area
-A = sa_from_mass(mass, "lizard") # surface area (m^2)
-psa = sapply(psi_deg, prop_silhouette_area, taxa = "lizard", posture = "prostrate") # Projected silhouette area (m^2)
+A = surface_area_from_mass(mass, "lizard") # surface area (m^2)
+psa = sapply(psi_deg, proportion_silhouette_area, taxon = "lizard", posture = "prostrate") # Projected silhouette area (m^2)
 
 # Change negative values to zero
 psa[psa < 0] = 0
@@ -423,10 +418,10 @@ for(hour in 1:24) {
 We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$
 (W). We will estimate the lizard's heat transfer coefficient, $H_L$
 ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards
-(`heat_transfer_coefficient()`), but also illustrate a function
+(`heat_transfer_coefficient()`). We also illustrate a function
 estimating $H_L$ using a spherical approximation
 (`heat_transfer_coefficient_approximation()`) and a simplified
-approximation (`heat_transfer_coefficient_simple()`).
+approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available.
 
 ```{r}
 ap = airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
@@ -451,7 +446,6 @@ H_L2= heat_transfer_coefficient_approximation(V = V_liz, D = svl, K = 25.7 * 10^
 # Estimate the heat transfer coefficient using a simplified version of the approximation
 H_L3= heat_transfer_coefficient_simple(V = V_liz, D = svl, type = "Gates")
 ```
-*Abby: Added type=Gates above to fix error in H_L3, change if Gates is not the equation wanted. Also, maybe give a reason why one might want to use a spherical or simplified version*
 
 We estimate convective heat exchange between the animal and surrounding
 air using the following relationship:
@@ -531,7 +525,7 @@ for(hr in 1:24) {
 
 ```
 
-We additionally estimate $T_e$ using a specialized function for lizards
+We additionally estimate $T_b$ using a specialized function for lizards
 [@buckley2008link]:
 
 ```{r}
@@ -609,19 +603,15 @@ understanding responses to variable and changing environments
 [@suggitt2018extinction].
 
 ## Acknowledgements
-
-We thank Brian Helmuth and Eric Riddell for providing and checking
-functions. We thank Ray Huey, Joel Kingsolver, Luke Miller, Warren
-Porter, and Art Woods for assistance and input. We particularly thank
+We thank Ray Huey, Joel Kingsolver, Luke Miller, Warren
+Porter, and Art Woods for assistance and input and Brian Helmuth for providing functions. We particularly thank
 Michael Kearney for extensive input on TrenchR and its alignment with
 NicheMapR and for contributing two educational modules.
-
-[Check with Eric]
 
 ## Authors' contributions
 
 LB conceived and designed the package and lead all aspect of the
-packages creation and dissemination; BBO, IC, AJ, OL, AM, YS wrote and
+packages creation and dissemination; BBO, IC, AJ, OL, AM, ER, YS wrote and
 edited functions and associated package resources; AJ configured the
 package; AM, BBO, YS, and LB converted and edited the educational
 modules. All authors contributed critically to the drafts and gave final

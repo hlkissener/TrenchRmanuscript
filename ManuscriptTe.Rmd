@@ -190,10 +190,10 @@ dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(
 
 #Also estimate using a spherical approximation and a simplified version of the approximation.
 H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxa="flyinginsect")
-H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211)
+H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211, type="Gates")
 
 #surface area from length(m)
-A= sa_from_length(l=0.0211)
+A= surface_area_from_length(L=0.0211)
 ```
 
 We then implement the energy budget as follows.
