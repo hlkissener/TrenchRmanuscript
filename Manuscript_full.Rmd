@@ -16,7 +16,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
--   Within the word count (6000-7000 words for Standard Articles, 3000
+-   Within the word count (6000-7000 words for Standard Articles, 3000-4000
     words for Applications and Practical Tools)
 
 -   Continuous line and page numbering throughout
@@ -63,7 +63,7 @@ Type: applications
 4.  The package aims to introduce and enable microclimate and
     biophysical modelling to improve ecological and evolutionary
     forecasting. We further this aim through a series of educational
-    modules to introduce the field of biophysical ecology.
+    modules that introduce the field of biophysical ecology.
 
 **Keywords**: biophysical, climate change, ecotherm, energy budget,
 mechanistic models, microclimate, scaling, temperature
@@ -145,10 +145,10 @@ Microclima package [@maclean2019microclima].
 
 The TrenchR package (<http://trenchproject.github.io/TrenchR/>) aims to
 promote transparency and reproducibility. We welcome contributions and
-corrections from users. Our package is built using the devtools
+corrections from users. Our package was built using the devtools
 methodology (<https://github.com/r-lib/devtools>) in Github. Issues and
 feature requests can be contributed in Github
-(<https://github.com/trenchproject/TrenchR>). The packageis available
+(<https://github.com/trenchproject/TrenchR>). The package is available
 via Github and has been submitted to CRAN.
 
 We adapted functions from biophysical ecology textbooks
@@ -193,7 +193,7 @@ functions aggregate these forms of heat exchange into energy balances
 and to use the energy balances to predict body temperatures.
 
 **Specific biophysical functions** provide biophysical models that have
-been built for specific organisms based on their physical properties,
+been built for particular organisms based on their physical properties,
 behavior, environment, and life history. We currently provide published
 biophysical models for lizards, salamanders, butterflies, grasshoppers,
 limpets, mussels, and snails. Most models predict operative
@@ -243,7 +243,7 @@ at the bookdown server
 R markdown files are available in Github
 (<https://github.com/trenchproject/TrenchRmodules>).
 
-## Example Application
+## Examples
 
 We illustrate the use of the TrenchR package by estimating an energy
 budget for a *Sceloporus* lizard on June 1, 2021 in Santa Fe, New

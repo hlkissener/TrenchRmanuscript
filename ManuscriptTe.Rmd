@@ -117,7 +117,7 @@ dat$Temp[dat$Temp< -10]=NA
 match1= match(dat$site, sites$Site)
 dat$Elev=sites[match1,"Elevation"]
 
-#calculate Julian day
+#calculate day of year
 date.ct <- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST")
 dat$J= round(as.numeric(julian(date.ct, origin = as.Date("2011-01-01") )))
 dat$hour= date.ct$hour
@@ -134,7 +134,7 @@ dataug= subset(dat, dat.dt$mon==7)
 dat= subset(dataug, dataug$Rad>5)
 ```
 
-We next illustrate quantifying operative environmental temperatures, which are estimated body temperatures for grasshoppers in the specified environments. We first read and process time series of environmental data. We estimate the zenith angle, the angle between the sun's rays and the vertical, across Julian days and hours.
+We next illustrate quantifying operative environmental temperatures, which are estimated body temperatures for grasshoppers in the specified environments. We first read and process time series of environmental data. We estimate the zenith angle, the angle between the sun's rays and the vertical, across days of the year and hours.
 ```{r}
 #Calculate zenith
 dat$psi= zenith_angle(dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
@@ -197,7 +197,7 @@ A= surface_area_from_length(l=0.0211)
 ```
 
 We then implement the energy budget as follows.
-```{r, results = FALSE, warning=FALSE}
+```{r echo=T, results = 'hide', warning=FALSE}
 TeGates= rep(NA, nrow(dat) )
 
 for(ind in 1:nrow(dat) ){
