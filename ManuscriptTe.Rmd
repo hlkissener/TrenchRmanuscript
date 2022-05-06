@@ -162,12 +162,12 @@ We then use biophysical models to estimate body temperatures based on air and su
 ```{r, warning=FALSE}
 
 ##Calculate operative temperature, Te
-dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, L=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
+dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, l=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
 
 #T_a	and T_g are air and surface temperatures (C), respectively; u	is wind speed (m/s); 
 #H is total (direct + diffuse) solar radiation flux (W/m^2); 
 #K_t	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere;
-#psi is solar zenith angle (degrees); L	is grasshopper length (m);
+#psi is solar zenith angle (degrees); l	is grasshopper length (m);
 #Acondfact is the proportion of the grasshopper surface area in contact with the ground;
 #abs is absorptivity of grasshopper to solar radiation (proportion);
 #r_g is substrate solar reflectivity (proportion).
@@ -183,17 +183,17 @@ dat$Te[dat$Te>100]<-NA
 We then implement a generic energy budget. We first illustrate the estimation of convective heat transfer coefficients as a function of wind speed.
 ```{r}
 #Estimate heat transfer coefficient using empirical relationship
-dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxa="cylinder")
+dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxon="cylinder")
 #where V is	air velocity (m/s); D is the characteristic dimension (m);
 #K is the thermal conductivity of air (W m^-1 K^-1);
 #nu is the kinematic viscosity of air (m^2 s^-1)
 
 #Also estimate using a spherical approximation and a simplified version of the approximation.
-H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxa="flyinginsect")
+H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxon="flyinginsect")
 H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211, type="Gates")
 
 #surface area from length(m)
-A= surface_area_from_length(L=0.0211)
+A= surface_area_from_length(l=0.0211)
 ```
 
 We then implement the energy budget as follows.
