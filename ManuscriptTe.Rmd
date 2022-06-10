@@ -78,7 +78,7 @@ u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"],
 u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
 ```
 
-The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground (Figure 1). Profiles can be fit as a single smooth function or segments.
+The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground (Figure S1). Profiles can be fit as a single smooth function or segments.
 ```{r, echo=FALSE}
 #replace infinity with N
 t.seq1[which(!is.finite(t.seq1))]=NA
@@ -94,7 +94,7 @@ points(u.seq3, z.seq, type = "l", lty="dotted")
 points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 ```
 
-*Figure 1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: air_temp_profile_neutral(); dashed: air_temp_profile()] and segmented estimation [dotted: air_temp_profile_segment()].*
+*Figure S1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: air_temp_profile_neutral(); dashed: air_temp_profile()] and segmented estimation [dotted: air_temp_profile_segment()]. The points indicate empirical points used for parameterization.*
 
 # Biophysical models
 ```{r, include=FALSE}
@@ -153,7 +153,7 @@ dat$Ugrass= wind_speed_profile_neutral(u_r=dat$Wind, zr=0.5, z0=0.02,z=z)
 ```
 
 ```{r, include=FALSE}
-#cut nas
+#cut NAs
 dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour","psi","Tgrass","Ugrass")]
 dat= na.omit(dat)
 ```
@@ -165,11 +165,11 @@ We then use biophysical models to estimate body temperatures based on air and su
 dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, l=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
 
 #T_a	and T_g are air and surface temperatures (C), respectively; u	is wind speed (m/s); 
-#H is total (direct + diffuse) solar radiation flux (W/m^2); 
+#H is total (direct + diffuse) solar radiation flux (W/m^2);
 #K_t	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere;
 #psi is solar zenith angle (degrees); l	is grasshopper length (m);
 #Acondfact is the proportion of the grasshopper surface area in contact with the ground;
-#abs is absorptivity of grasshopper to solar radiation (proportion);
+#abs is absorptivity of grasshopper to solar radiation (proportion); abs=0.9 corresponds to dark colors.
 #r_g is substrate solar reflectivity (proportion).
 ```
 
@@ -213,7 +213,7 @@ for(ind in 1:nrow(dat) ){
 #K is thermal conductivity. 
 ```
 
-We aggregate the data and plot average conditions across sites (Figure 2). The simplifying assumptions in the biophysical model implementation reduce alignment with the observed temperatures of grasshoppers, but the divergence of grasshopper temperatures from air temperatures at 2m and, to a lesser extent, air temperatures at grasshopper height demonstrate the importance of implementing biophysical models.
+We aggregate the data and plot average conditions across sites (Figure S2). The simplifying assumptions in the biophysical model implementation reduce alignment with the observed temperatures of grasshoppers, but the divergence of grasshopper temperatures from air temperatures at 2m and, to a lesser extent, air temperatures at grasshopper height demonstrate the importance of implementing biophysical models.
 ```{r, echo=FALSE, warning=FALSE}
 dat$TeGates=TeGates-273.15
 
@@ -252,7 +252,7 @@ ggplot(data=dat.pl, aes(x=hour, y = value, color=variable))+geom_line(aes(lty=va
 
 ```
 
-*Figure 2. Diurnal temperature variation averaged across days in August varies across the elevations of CO sites (panels) and the type of temperature (C). Microclimate models indicate that the air temperatures experienced by grasshoppers near the ground (Ta grasshopper height) is generally above air temperatures (Ta) and close to surface temperatures (Ts). Body temperatures estimated by a grasshopper specific biophysical model (Te) are fairly similar to but sometimes less than the body temperatures of a physical grasshopper model implanted with a thermistor (Te observed). The general biophysical models that makes simplifying assumptions (Te Gates) tends to overestimate body temperatures.*
+*Figure S2. Diurnal temperature variation averaged across days in August varies across the elevations of CO sites (panels) and the type of temperature (C). Microclimate models indicate that the air temperatures experienced by grasshoppers near the ground (Ta grasshopper height) is generally above air temperatures (Ta) and close to surface temperatures (Ts). Body temperatures estimated by a grasshopper specific biophysical model (Te) are fairly similar to but sometimes less than the body temperatures of a physical grasshopper model implanted with a thermistor (Te observed). The general biophysical models that makes simplifying assumptions (Te Gates) tends to overestimate body temperatures.*
 
 ```{r, include=FALSE}
 #plot by date time

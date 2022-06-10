@@ -2,8 +2,8 @@
 title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
 author: "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
 output:
-  html_document: default
   word_document: default
+  html_document: default
   pdf_document: default
 bibliography: bibliography.bib
 csl: methods-in-ecology-and-evolution.csl
@@ -56,7 +56,7 @@ Type: applications
     temperatures for a variety of ectothermic taxa. Additional functions
     model and temporally partition air and soil temperatures and solar
     radiation. We offer utility functions to aid in estimating the
-    organismal and environonmental parameters needed for biophysical
+    organismal and environmental parameters needed for biophysical
     ecology.
 3.  TrenchR focuses on simple and modular functions so users can create
     transparent and flexible models for biophysical applications.
@@ -100,7 +100,7 @@ organismal conditions have long lingered in books
 [@campbell2000introduction; @gates1980biophysical] and articles
 [@porter1969thermodynamic; @porter1983biophysical], but adoption of
 these tools has not kept pace with research on climate change responses.
-Adoption of biophysical approaches is expanding with recognition of the
+In recent decades, adoption of biophysical approaches is expanding with recognition of the
 importance of spatial and temporal environmental variation to
 determining climate change responses [@buckley2018leveraging;
 @kearney2017nichemapr] and the increased dissemination of computational
@@ -121,7 +121,7 @@ their environment.
 knitr::include_graphics('figures/TrenchRBiophys.png')
 ```
 
-**Figure 1** A) Microclimate models scale air and soil temperatures and windspeeds from sensor to organismal heights. B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. Grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
+**Figure 1** A) Microclimate models scale air and soil temperatures and windspeeds from sensor to organismal heights. B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. A thermal image depicts how grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
 
 The TrenchR package is intended to complement the NicheMapR package,
 which includes sophisticated microclimate [@kearney2017nichemapr] and
@@ -130,7 +130,7 @@ code was recently released, the complexity of NicheMapR functions can
 make it difficult to understand and modify the source code. Many of the
 approaches are similar between the packages, but TrenchR provides simple
 functions to aid the understanding and transparency of biophysical
-approaches. The TrenchR functions are modular and easily adapt to a
+approaches. Some variable definitions and units are lacking in NicheMapR. The TrenchR functions are modular and easily adapt to a
 variety of organisms and research questions. Although many of the
 TrenchR functions are general, some components of TrenchR are best
 suited for ectothermic animals. We omit plant specific biophysical
@@ -170,7 +170,7 @@ the basis of microclimate and biophysical models (e.g., zenith and
 declination angles, which describe the angles of incident sunlight),
 facilitate modeling diurnal temperature variation, and estimate
 biologically relevant aggregate metrics such as degree days available
-for development.
+for oranismal development.
 
 **Microclimate functions** allow estimating the environmental conditions
 experienced by organisms. Temperature and wind profile functions scale
@@ -200,7 +200,7 @@ limpets, mussels, and snails. Most models predict operative
 environmental temperatures, which are the equilibrium body temperatures
 of organisms with specified physical properties in a specific
 microclimate and assume no heat exchange via metabolism or evaporation
-[@bakken1992measurement].
+[@bakken1992measurement]. However, we also present an analytical function for humid operative temperature that incorporates the effects of evaporative cooling on operative temperatures for wet-skinned ectotherms, such as salamanders.
 
 ### Vignettes and introductory tutorials
 
@@ -255,6 +255,7 @@ functions. Finally, we use an integrated biophysical model to estimate
 operative environmental temperatures. See Appendix S1 for another
 example examining a time series of microclimate data and applying and
 testing the biophysical models.
+**Flow cart of functions?
 
 We will use the energy budget to estimate body temperature, $T_b$, which
 can depart dramatically from the air temperatures due to energy exchange
@@ -267,18 +268,18 @@ and with the ground via conduction. The balance of these heat exchanges
 ectotherms) can be estimated and often referred to as operative
 environmental temperature, $T_e$ [@bakken1992measurement]. $T_e$ is an
 estimate of $T_b$ and the package functions refer to $T_b$ for
-simplicity.
+simplicity. Our examplar exstimation of $T_b$ assumes thermal equilibrium.
 
 Let us assume the lizard is in an unshaded location where a weather
 station at standard height (2 meters) reports that the daily air
 temperature varies from a minimum of 10°C to a maximum of 25°C and the
 wind speed averages 1 m/s. The soil surface temperature varies from a
 minimum of 15°C to a maximum of 30°C. We assume that atmospheric
-transmissivity $\tau = 0.7$ and albedo $\rho = 0.6$
+transmissivity $\tau = 0.7$ and albedo $\rho = 0.6$.
 
 ### Environmental data
 
-We first prepare the environmental data for analysis. We will estimate
+At the first stage, we prepare the environmental data for analysis. We will estimate
 hourly air and soil temperatures and radiation using a function
 describing diurnal temperature variation. We start by estimating the day
 of year and the timing of sunrise and sunset:
@@ -330,7 +331,7 @@ Sdif = Srad[2,]; # Diffuse solar radiation
 Sref = Srad[3,]; # Reflected solar radiation
 ```
 
-We then calculate hourly air and soil temperatures based on daily
+We then calculate hourly air and soil surface temperatures based on daily
 minimum and maximum temperatures. We select the sine-exponential model
 for air temperature and the sine model for surface temperature:
 
@@ -341,11 +342,11 @@ Ta = sapply(1:24, diurnal_temp_variation_sineexp, T_max = Tmax, T_min = Tmin, t_
 Ts = sapply(1:24, diurnal_temp_variation_sine, T_max = Tmax_s, T_min = Tmin_s) 
 ```
 
-We use microclimate models to scale air temperature and wind speed from
+At the second stage, we use microclimate models to scale air temperature and wind speed from
 weather station height (2m) to lizard height (0.02m). We assume a
 surface roughness of $z_0 = 0.2$ m, which corresponds to bare sand and
 determines the turbulence of airflow. We implement a neutral air
-temperature profile, an air temperature profile forced by wind speed,
+temperature profile driven by density differences, an air temperature profile forced by wind speed,
 and a neutral wind speed profile.
 
 ```{r}
@@ -361,7 +362,7 @@ V_liz= wind_speed_profile_neutral(u_r = V, zr = 2, z0 = 0.2 , z = 0.02) # Neutra
 
 ### Energy balance
 
-We will be solving the following energy balance to estimate $T_e$:
+Finally, we will use our microclimates estimates to solve the following energy balance to estimate $T_e$:
 $$Q_{net} = Q_{abs} - Q_{emit} - Q_{conv} - Q_{cond} - Q_{met} - Q_{evap},$$
 where $Q_{net}$ is the net energy exchange with the environment (W),
 $Q_{abs}$ is the solar radiation absorbed (W), $Q_{emit}$ is the net
@@ -442,10 +443,10 @@ K = mean(K) # Average thermal conductivity across the day
 nu = mean(nu) # Average kinematic viscosity
 
 # Estimate the heat transfer coefficient using an empirical relationship for lizards
-H_L = heat_transfer_coefficient(V = V_liz, D = svl, K = 25.7 * 10^(-3), nu = 15.3 * 10^(-6), taxon = "lizard_surface")
+H_L = heat_transfer_coefficient(V = V_liz, D = svl, K = K, nu = nu, taxon = "lizard_surface")
 
 # Estimate the heat transfer coefficient using a spherical approximation
-H_L2= heat_transfer_coefficient_approximation(V = V_liz, D = svl, K = 25.7 * 10^(-3), nu = 15.3 * 10^(-6), taxon = "lizard")
+H_L2= heat_transfer_coefficient_approximation(V = V_liz, D = svl, K = K, nu = nu, taxon = "lizard")
 
 # Estimate the heat transfer coefficient using a simplified version of the approximation
 H_L3= heat_transfer_coefficient_simple(V = V_liz, D = svl, type = "Gates")
@@ -597,9 +598,7 @@ models for biophysical ecology and evolution. The resultant models are
 likely to be sufficiently detailed for many applications, but users are
 referred to NicheMapR for more detailed biophysical models
 [@kearney2017nichemapr; @kearney2020nichemapr]. We focus on models that
-predict equilibrium conditions for simplicity. Such models generally do
-not present computational challenges so our models are not optimized for
-computational efficiency. Making classic biophysical ecology techniques
+predict equilibrium conditions for simplicity (that is, steady-state conditions). Such models generally do not present computational challenges so our models are not optimized for computational efficiency. Making classic biophysical ecology techniques
 more accessible will allow researchers to take advantage of rapidly
 accumulating data on environmental conditions and organismal traits to
 understand and predict ecological and evolutionary responses.
