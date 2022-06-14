@@ -2,9 +2,9 @@
 title: "Appendix S1"
 author: "Buckley et al."
 output:
-  html_document: default
-  pdf_document: default
   word_document: default
+  pdf_document: default
+  html_document: default
   rmarkdown::html_vignette: default
 ---
 
@@ -98,13 +98,12 @@ points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1
 # Biophysical models
 ```{r, include=FALSE}
 #Grasshopper data
-setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
-spec.dat=read.csv("SpecData.csv")
+spec.dat=read.csv("./data/SpecData.csv")
 
 #read weather data
-dat=read.csv("DatAll_Pace2011.csv", sep=",", na.strings = c("-49.99","NA"))
+dat=read.csv("./data/DatAll_Pace2011.csv", sep=",", na.strings = c("-49.99","NA"))
 #match site data
-sites=read.csv("SiteElevations.csv", sep=",")
+sites=read.csv("./data/SiteElevations.csv", sep=",")
 
 #combine soil temperatures
 dat$SoilTemp= rowMeans(dat[,c("SoilTemp","SoilTemperature")], na.rm = TRUE) 
@@ -268,9 +267,7 @@ plot.t= ggplot(data=dat.s, aes(x=Jhr, y = value, color=variable))+geom_line(aes(
 ```
 
 ```{r, include=FALSE}
-setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/figures/")
-
-pdf("TeTime2.pdf", height = 10, width = 15)
+pdf("./figures/TeTime2.pdf", height = 10, width = 15)
 plot.t
 dev.off()
 

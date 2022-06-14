@@ -552,10 +552,10 @@ for(hour in 1:24) {
 ```
 
 The microclimate models indicate that air temperatures at lizard height
-are similar to surface temperatures (Figure 2). The biophysical models
+are similar to surface temperatures (Figure 3). The biophysical models
 indicate that solar radiation will elevate lizard body temperatures far
 above air temperatures and that the lizard will face thermal stress if
-it is unable to seek shade (Figure 2). The three biophysical models
+it is unable to seek shade (Figure 3). The three biophysical models
 predict different body temperatures during peak period of solar
 radiation because they model interactions with the ground differently
 and users are encouraged to review the details of each biophysical model
@@ -582,7 +582,7 @@ legend("topleft",
 
 ```
 
-**Figure 2**. Body temperatures (Te) are predicted to drastically exceed
+**Figure 3**. Body temperatures (Te) are predicted to drastically exceed
 air temperature when lizards are exposed to high levels of solar
 radiation. Air temperatures (Ta, °C) at lizard height (0.02m) are
 predicted to exceed air temperatures at 2m and to be similar to surface
