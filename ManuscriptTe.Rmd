@@ -21,12 +21,11 @@ library(reshape)
 ```
 
 # APPENDIX S1
-We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. We first use a time series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. We then use a time series of air and surface temperatures, wind speeds, and solar radiation collected at a single height to implement a biophysical model for grasshoppers and compare estimates to observations.
+We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. We first use a time series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. We then use a time series of air and surface temperatures, wind speeds, and solar radiation collected at a single height to implement a biophysical model for grasshoppers and compare estimates to observations. R markdown files with the full code and the associated data are available at https://github.com/trenchproject/TrenchRmanuscript/. 
 
 # Microclimate models
 ```{r, include=FALSE}
-setwd("/Volumes/GoogleDrive/Shared drives/TrEnCh/Projects/TrenchR/data/")
-C1all=read.csv("microclimate_C1.csv", sep=",", na.strings = c("-49.99","NA"))
+C1all=read.csv("./data/microclimate_C1.csv", sep=",", na.strings = c("-49.99","NA"))
 ```
 
 ```{r, include=FALSE}
