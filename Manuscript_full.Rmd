@@ -118,7 +118,7 @@ using an energy budget to balance heat exchanges between organisms and
 their environment.
 
 ```{r, echo=FALSE, fig.height=4, out.width = "75%"}
-knitr::include_graphics('figures/TrenchRBiophys.png')
+knitr::include_graphics('./figures/TrenchRBiophys.png')
 ```
 
 **Figure 1** A) Microclimate models scale air and soil temperatures and windspeeds from sensor to organismal heights. B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. A thermal image depicts how grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
@@ -127,10 +127,10 @@ The TrenchR package is intended to complement the NicheMapR package,
 which includes sophisticated microclimate [@kearney2017nichemapr] and
 biophysical [@kearney2020nichemapr] models. Although the Fortran source
 code was recently released, the complexity of NicheMapR functions can
-make it difficult to understand and modify the source code. Many of the
+make it difficult to understand and modify the source code. The function documentation including variable definitions and units can also be challenging to follow. Many of the
 approaches are similar between the packages, but TrenchR provides simple
 functions to aid the understanding and transparency of biophysical
-approaches. Some variable definitions and units are lacking in NicheMapR. The TrenchR functions are modular and easily adapt to a
+approaches. The TrenchR functions are modular and easily adapt to a
 variety of organisms and research questions. Although many of the
 TrenchR functions are general, some components of TrenchR are best
 suited for ectothermic animals. We omit plant specific biophysical
@@ -153,7 +153,7 @@ via Github and has been submitted to CRAN.
 
 We adapted functions from biophysical ecology textbooks
 [@campbell2000introduction; @gates1980biophysical] and research
-articles. Source references are included in function headers. We have
+articles. Source references are included in function headers and reference sections. We have
 incorporated default parameters (e.g., organism emissivity or heat
 conduction rates) when general values are available. Many functions
 additionally include comments that describe potential parameterizations.
@@ -163,7 +163,7 @@ provide several data tables in TrenchR.
 
 ### Components
 
-TrenchR functions are organized into the following categories:
+TrenchR functions are organized into the following categories (Figure 2):
 
 **Utility functions** allow estimating environmental metrics that form
 the basis of microclimate and biophysical models (e.g., zenith and
@@ -171,6 +171,8 @@ declination angles, which describe the angles of incident sunlight),
 facilitate modeling diurnal temperature variation, and estimate
 biologically relevant aggregate metrics such as degree days available
 for oranismal development.
+
+**Allometric functions** allow estimating the dimensions of organisms needed for energy balances and other analyses. The functions can convert between organismal length, mass, surface area, and volume. The functions can also estimate the silhoutte area, which describes the organismal area exposed to solar radiation.
 
 **Microclimate functions** allow estimating the environmental conditions
 experienced by organisms. Temperature and wind profile functions scale
@@ -201,6 +203,12 @@ environmental temperatures, which are the equilibrium body temperatures
 of organisms with specified physical properties in a specific
 microclimate and assume no heat exchange via metabolism or evaporation
 [@bakken1992measurement]. However, we also present an analytical function for humid operative temperature that incorporates the effects of evaporative cooling on operative temperatures for wet-skinned ectotherms, such as salamanders.
+
+```{r, echo=FALSE, fig.height=4, out.width = "75%"}
+knitr::include_graphics('./figures/TrenchRFlow.png')
+```
+
+**Figure 2** An examplar aim of translating from environmental and phenotypic data to organismal conditions in a given environment (grey boxes) can be achieved in TrenchR via several categories of functions (white boxes). We list example functions for each category used in the example application below.
 
 ### Vignettes and introductory tutorials
 
@@ -239,23 +247,22 @@ Kearney introducing the Microclim environmental data
 biophysical modelling to examine broad scale climatic limits. The
 tutorials are provided in html form and available for download as a pdf
 at the bookdown server
-(<https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/>). The
-R markdown files are available in Github
+(<https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/>).
+R markdown files for the tutorials are available in Github
 (<https://github.com/trenchproject/TrenchRmodules>).
 
-## Examples
+## Example application
 
 We illustrate the use of the TrenchR package by estimating an energy
 budget for a *Sceloporus* lizard on June 1, 2021 in Santa Fe, New
-Mexico, USA (35.69, -105.944, elevation: 2121 meters). The example is
+Mexico, USA (35.69°, -105.944°, elevation: 2121 m). The example is
 also incorporated in the *Using energy balances to estimate body
-temperatures* vignette. We start by generating environmental inputs.
+temperatures* vignette. We start by generating environmental inputs (Figure 2).
 Using these inputs, we estimate the energy budget with component
 functions. Finally, we use an integrated biophysical model to estimate
 operative environmental temperatures. See Appendix S1 for another
 example examining a time series of microclimate data and applying and
 testing the biophysical models.
-**Flow cart of functions?
 
 We will use the energy budget to estimate body temperature, $T_b$, which
 can depart dramatically from the air temperatures due to energy exchange
