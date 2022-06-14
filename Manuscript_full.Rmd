@@ -2,8 +2,8 @@
 title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
 author: "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
 output:
-  word_document: default
   html_document: default
+  word_document: default
   pdf_document: default
 bibliography: bibliography.bib
 csl: methods-in-ecology-and-evolution.csl
@@ -579,7 +579,6 @@ mtext(side = 4, line = 3, 'Radiation (W/m^2)')
 legend("topleft",
        legend=c("Ta (2m)", "Ta (0.02m)", "Ts", "Te", "Radiation"),
        lty=1, pch=NA, col=c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF"))
-
 ```
 
 **Figure 3**. Body temperatures (Te) are predicted to drastically exceed

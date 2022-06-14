@@ -2,9 +2,9 @@
 title: "Appendix S1"
 author: "Buckley et al."
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
   rmarkdown::html_vignette: default
 ---
 
@@ -194,7 +194,7 @@ H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211, type="Gates")
 A= surface_area_from_length(l=0.0211)
 ```
 
-We then implement the energy budget as follows.
+We then implement the energy budget as follows. We note that the energy budget can not be solved for some time periods and errors are generated.
 ```{r echo=T, results = 'hide', warning=FALSE}
 TeGates= rep(NA, nrow(dat) )
 
