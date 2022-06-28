@@ -1,5 +1,5 @@
 ---
-title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
+title: 'TrenchR: an R package for transparent microclimate and biophysical ecology'
 author: 
   - "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy,"
   - "Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
@@ -211,7 +211,7 @@ tau <- 0.7 # Atmospheric transmissivity
 rho <- 0.6 # Albedo
 Tb0 <- 25  # Initial assumption of body temperature (C)
 
-doy   <- day_of_year("2021-06-01", format = "%Y-%m-%d") # Julian Date (DOY)
+doy   <- day_of_year("2021-06-01", format = "%Y-%m-%d") # Day of year
 
 snoon <- solar_noon(lon = lon, doy = doy) # Estimate solar noon
 dayl  <- daylength(lat = lat, doy = doy)  # Estimate day length
@@ -236,11 +236,11 @@ psi_rad <- degrees_to_radians(psi_deg)
 
 Srad <- sapply(psi_rad, FUN = solar_radiation, doy = doy, tau = tau, elev = elev, rho = rho)
 
-# Separate solar radiation into direct, diffuse, and reflected
+# Separate solar radiation into direct, diffuse, and reflected components
 
-Sdir <- Srad[1,] # Direct solar radiation
-Sdif <- Srad[2,] # Diffuse solar radiation
-Sref <- Srad[3,] # Reflected solar radiation
+Sdir <- Srad[1,] # Direct solar radiation (W/m2)
+Sdif <- Srad[2,] # Diffuse solar radiation  (W/m2)
+Sref <- Srad[3,] # Reflected solar radiation  (W/m2)
 ```
 
 We then calculate hourly air and soil surface temperatures based on daily minimum and maximum temperatures. 
@@ -251,33 +251,23 @@ We select the sine-exponential model for air temperature and the sine model for 
 
 Ta <- sapply(1:24, diurnal_temp_variation_sineexp, T_max = Tmax, T_min = Tmin, t_r = tr, t_s = ts, alpha = 2.59, beta = 1.55, gamma = 2.2) 
 
-# Soil temperature (C)
+# Soil surface temperature (C)
 
 Ts <- sapply(1:24, diurnal_temp_variation_sine, T_max = Tmax_s, T_min = Tmin_s) 
 ```
 
-At the second stage, we use microclimate models to scale air temperature and wind speed from weather station height (2 m) to lizard height (0.02 m). 
+At the second stage, we use microclimate models to scale air temperature ($T_r$) and wind speed ($u_r$) from weather station height (reference height $z_r$= 2 m) to lizard height (organism height $z$= 0.02 m). 
 We assume a surface roughness of $z_0 = 0.2$ m, which corresponds to bare sand and determines the turbulence of airflow. 
-We implement a neutral air temperature profile driven by density differences, an air temperature profile forced by wind speed, and a neutral wind speed profile.
+We implement neutral air temperature and wind speed profiles driven by density differences but profiles forced by wind speed are also available.
 
 ```{r}
-# Scale air temperature to lizard height
-# T_r = reference temperature
-# zr  = reference height
-# z0  = surface roughness
-# z   = organism height
-# T_s = surface temperature
+# Neutral air temperature profile
 
-Ta_liz  <- air_temp_profile_neutral(T_r = Ta, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts)  # Neutral air temperature profile
-Ta_liz2 <- air_temp_profile(T_r = Ta, u_r = V, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts) # Air temperature profile forced by wind speed
+Ta_liz  <- air_temp_profile_neutral(T_r = Ta, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts) 
 
-# Scale wind speed to lizard height
-# u_r = reference wind speed
-# zr  = reference height
-# z0  = surface roughness
-# z   = organism height
+# Neutral wind speed profile
 
-V_liz <- wind_speed_profile_neutral(u_r = V, zr = 2, z0 = 0.2 , z = 0.02) # Neutral wind speed profile
+V_liz <- wind_speed_profile_neutral(u_r = V, zr = 2, z0 = 0.2 , z = 0.02) 
 ```
 
 ### Energy balance
@@ -288,7 +278,7 @@ $$Q_{net} = Q_{abs} - Q_{emit} - Q_{conv} - Q_{cond} - Q_{met} - Q_{evap},$$
 
 where $Q_{net}$ is the net energy exchange with the environment (W), $Q_{abs}$ is the solar radiation absorbed (W), $Q_{emit}$ is the net thermal radiation emitted (W), $Q_{conv}$ is energy exchange due to convection (W), $Q_{cond}$ is energy exchange due to conduction (W), $Q_{met}$ is the energy emitted due to metabolism (W), and $Q_{evap}$ is the energy emitted due to evaporative water loss (W). 
 We will estimate each term on the right side of the equation in turn. 
-Estimating $Q_{abs}$ requires the surface area exposed to radiation and the solar absorptivity of the animal surface ($a$ proportion). 
+Estimating $Q_{abs}$ requires the surface area exposed to radiation and the solar absorptivity of the animal surface ($a$ proportion). We use zenith angle $psi$ to estimate the projected (silhouette) area as a portion of the surface area of the organism, which allows estimating absorbed solar radiation.
 We model a 10 gram *Sceloporus* lizard with solar absorptivity $a = 0.9$ [@gates1980biophysical]. 
 We will initially assume $T_b = T_a$ to illustrate the calculations before solving for $T_b$ given the environmental conditions.
 
@@ -316,8 +306,7 @@ for (hour in 1:24) {
 }
 ```
 
-We estimate thermal radiation $Q_{emit}$ (W) for the lizard outdoors. 
-We assume the surface emissivity of lizards, $epsilon_s = 0.965$ [@barlett1967].
+We estimate thermal radiation $Q_{emit}$ (W) for the lizard outdoors, where $psa_{dir}$ and $psa_{ref}$ are the proportions of surface area $A$ ($m^2$) exposed to direct and reflected solar radiation, respectively. We assume the surface emissivity of lizards, $epsilon_s = 0.965$ [@barlett1967].
 
 ```{r}
 epsilon_s <- 0.965 # Surface emissivity of lizards
@@ -325,35 +314,25 @@ epsilon_s <- 0.965 # Surface emissivity of lizards
 Qemit <- rep(NA, 24)
 for (hour in 1:24) {
   
-  # psa_dir = proportions of surface area exposed to direct solar radiation
-  # psi_ref = proportions of surface area exposed to reflected solar radiation
-  # A       = surface area (m^2)
-
   Qemit[hour] <- Qemitted_thermal_radiation(epsilon = epsilon_s, A = A, psa_dir = psa[hour], psa_ref = 1-psa[hour], T_b = Ta_liz[hour] + 273.15, T_g = Ts[hour] + 273.15, T_a = Ta_liz[hour] + 273.15, enclosed = FALSE)
   
 }
 ```
 
 We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$ (W). 
-We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`). 
-We also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available.
+We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`). We average thermal conductivity and kinematic viscosity across the day for simplicity and since there is not substantial diurnal variation. We also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available.
 
 ```{r}
-ap <- airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
- 
 # Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
+
+ap <- airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
 
 DRYAIRout <- DRYAIR(db = Ta, bp = ap, alt = elev)
 
-K  <- DRYAIRout$thcond # Thermal conductivity (Wm^-2K^-1) 
-nu <- DRYAIRout$viskin # Kinematic viscosity (m2 s-1)
+K  <- mean(DRYAIRout$thcond) # Thermal conductivity (Wm^-2K^-1) 
+nu <- mean(DRYAIRout$viskin) # Kinematic viscosity (m2 s-1)
 
 svl <- 0.006 # Approximate snout vent length (meters) for Sceloporus, used as the characteristic dimension for heat transfer
-
-# We will use the average of K and nu across the day for simplicity and since there is not a substantial diurnal variation.
-
-K  <- mean(K)  # Average thermal conductivity across the day
-nu <- mean(nu) # Average kinematic viscosity
 
 # Estimate the heat transfer coefficient using an empirical relationship for lizards
 
@@ -374,7 +353,7 @@ $$Q_{conv} = ef \cdot H_L(A\cdot \mbox{proportion})(T_a-T_b),$$
 
 where an enhancement factor, $ef$, multiplier can be incorporated to account for increases in heat exchange resulting from air turbulence in field conditions. 
 We implement the function in R assuming that 2/3 of the lizard's surface area is exchanging heat through convection. 
-We currently estimate no convection since we are assuming $Tb = Ta$ for illustration purposes:
+We currently estimate no convection since we are assuming $T_b = T_a$ for illustration purposes:
 
 ```{r}
 Qconv <- rep(NA, 24)
@@ -441,14 +420,12 @@ for (hr in 1:24) {
 
 ```
 
-We additionally estimate $T_b$ using a specialized function for lizards [@buckley2008link]:
+We additionally estimate $T_b$ using a specialized function for lizards [@buckley2008link], where $F_d$, $F_r$, $F_a$, and $F_g$ are the view factors between the surface of the lizard and diffuse solar radiation, reflected solar radiation, atmospheric thermal radiation, and ground thermal radiation, respectively:
 
 ```{r}
 Te3 <- rep(NA, 24)
 for (hour in 1:24) {
   
-  # F_d, F_r, F_a, and F_g are the view factors between the surface of the lizard and diffuse solar radiation, reflected solar radiation, and atmospheric thermal radiation, and ground thermal radiation, respectively. 
-
   Te3[hour] <- Tb_lizard(T_a = Ta_liz[hour], T_g = Ts[hour], u = V_liz, svl = svl * 1000, m = mass, psi = psi_deg[hour], rho_S = rho, elev = elev, doy = doy, sun = TRUE, surface = TRUE, alpha_S = a, alpha_L = 0.965, epsilon_s = epsilon_s, F_d = 0.8, F_r = 0.5, F_a = 0.5, F_g = 0.5)
 
 }
