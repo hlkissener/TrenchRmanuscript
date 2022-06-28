@@ -1,10 +1,15 @@
 ---
 title: 'TrenchR: an R package for transparent environmental and ecological biophysics'
-author: "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
+author: 
+  - "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy,"
+  - "Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
 output:
   html_document: default
   word_document: default
-  pdf_document: default
+  pdf_document: 
+    pandoc_args: --listings
+    includes:
+      in_header: preamble.tex
 bibliography: bibliography.bib
 csl: methods-in-ecology-and-evolution.csl
 editor_options: 
@@ -14,6 +19,9 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(TrenchR)
+
 ```
 
 -   Within the word count (6000-7000 words for Standard Articles, 3000-4000
@@ -61,10 +69,10 @@ Acute thermal stress events are often more relevant to the physiology and energy
 Yet, daily and seasonal environmental variation is often neglected [@dillon2016introduction; @dillon2016life]. 
 We aim to help remedy these shortcomings by introducing the TrenchR package (<https://github.com/trenchproject/TrenchR>) as a component of the TrEnCh project (<https:www.trenchproject.com>), which builds computational and visualization tools to Translate Environmental Change into organismal responses.
 
-The mathematical tools for leveraging environmental data to predict organismal conditions have long lingered in books [@campbell2000introduction; @gates1980biophysical] and articles [@porter1969thermodynamic; @porter1983biophysical], but adoption of these tools has not kept pace with research on climate change responses.
+The mathematical tools for leveraging environmental data to predict organismal conditions have long lingered in books [@gates1980biophysical; @campbell2000introduction] and articles [@porter1969thermodynamic; @porter1983biophysical], but adoption of these tools has not kept pace with research on climate change responses.
 In recent decades, adoption of biophysical approaches is expanding with recognition of the importance of spatial and temporal environmental variation to determining climate change responses [@buckley2018leveraging; @kearney2017nichemapr] and the increased dissemination of computational tools.
 
-Estimating how organisms experience their thermal environment generally entails two classes of models [@campbell2000introduction; @gates1980biophysical] (Figure 1).
+Estimating how organisms experience their thermal environment generally entails two classes of models [@gates1980biophysical; @campbell2000introduction] (Figure 1).
 Microclimate models allow scaling conditions from sensors to organism height. They can characterize heat and air transport to estimate vertical air and soil temperature and wind profiles. 
 They can also characterize direct and diffuse solar radiation and longwave radiation emanating from the sky, ground, and surrounding objects like vegetation. 
 Biophysical models estimate body temperatures using an energy budget to balance heat exchanges between organisms and their environment.
@@ -141,7 +149,7 @@ Components of an energy budget can be estimated using individual functions and t
 We additionally offer a *List of symbols* used in equations.
 
 For additional background on microclimate and biophysical modeling, we have updated a series of tutorials entitled *Physical Processes in Ecosystems*. 
-We intend the tutorials to provide a more contained and accessible introduction to microclimate and biophysical modeling than that included in classic textbooks [@campbell2000introduction; @gates1980biophysical]. 
+We intend the tutorials to provide a more contained and accessible introduction to microclimate and biophysical modeling than that included in classic textbooks [@gates1980biophysical; @campbell2000introduction]. 
 The tutorials provide less detailed coverage of many of the topics contained in the books. 
 The series of 14 tutorials starts with an overview of the calculus and physics principles underlying the modeling. 
 Thermodynamics and energy budget modeling are then introduced with detailed examples. 
@@ -153,7 +161,7 @@ R markdown files for the tutorials are available in Github (<https://github.com/
 
 ## Example Application
 
-We illustrate the use of the TrenchR package by estimating an energy budget for a *Sceloporus* lizard on June 1, 2021 in Santa Fe, New Mexico, USA (35.69$^\circ$, -105.944$^\circ$, elevation: 2121 m). 
+We illustrate the use of the TrenchR package by estimating an energy budget for a *Sceloporus* lizard on June 1, 2021 in Santa Fe, New Mexico, USA (35.69$^\circ$N, -105.944$^\circ$W, elevation: 2121 m). 
 The example is also incorporated in the *Using energy balances to estimate body temperatures* vignette. 
 We start by generating environmental inputs (Figure 2).
 Using these inputs, we estimate the energy budget with component functions. 
@@ -168,8 +176,8 @@ The balance of these heat exchanges (omitting metabolism and evaporation, which 
 $T_e$ is an estimate of $T_b$ and the package functions refer to $T_b$ for simplicity. 
 Our exemplar estimation of $T_b$ assumes thermal equilibrium.
 
-Let us assume the lizard is in an unshaded location where a weather station at standard height (2 meters) reports that the daily air temperature varies from a minimum of 10$^\circ$C to a maximum of 25$^\circ$C and the wind speed averages 1 m/s. 
-The soil surface temperature varies from a minimum of 15$^\circ$C to a maximum of 30$^\circ$C. 
+Let us assume the lizard is in an unshaded location where a weather station at standard height (2 meters) reports that the daily air temperature varies from a minimum of 10 $^\circ$C to a maximum of 25 $^\circ$C and the wind speed averages 1 m/s. 
+The soil surface temperature varies from a minimum of 15 $^\circ$C to a maximum of 30 $^\circ$C. 
 We assume that atmospheric transmissivity $\tau = 0.7$ and albedo $\rho = 0.6$.
 
 ### Environmental data
@@ -178,9 +186,7 @@ At the first stage, we prepare the environmental data for analysis.
 We will estimate hourly air and soil temperatures and radiation using a function describing diurnal temperature variation. 
 We start by estimating the day of year and the timing of sunrise and sunset:
 
-```{r, echo=FALSE}
-library(TrenchR)
-```
+
 
 ```{r}
 # Set up input data as variables

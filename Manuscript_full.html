@@ -9,7 +9,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis" />
+<meta name="author" content="Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy," />
+<meta name="author" content="Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis" />
 
 
 <title>TrenchR: an R package for transparent environmental and ecological biophysics</title>
@@ -387,8 +388,9 @@ pre code {
 <h1 class="title toc-ignore">TrenchR: an R package for transparent
 environmental and ecological biophysics</h1>
 <h4 class="author">Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac
-Caruso, Aji John, Ofir Levy, Abigail V. Meyer, Eric A. Riddell, Yutaro
-Sakairi, and Juniper Simonis</h4>
+Caruso, Aji John, Ofir Levy,</h4>
+<h4 class="author">Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi,
+and Juniper Simonis</h4>
 
 </div>
 
@@ -455,8 +457,8 @@ equal to air temperatures at weather station height (usually 2 meters).
 However, air temperatures near the ground where most organisms reside
 are often considerably warmer, and absorption of solar and thermal
 radiation can raise body temperatures well above air temperatures,
-resulting in potential discrepancies of tens of degrees Celsius <span class="citation">(M. Kearney et al., 2009; Sinclair et al., 2016; Sunday
-et al., 2014)</span>. Applications are increasingly demonstrating the
+resulting in potential discrepancies of tens of degrees Celsius <span class="citation">(Kearney et al., 2009; Sinclair et al., 2016; Sunday et
+al., 2014)</span>. Applications are increasingly demonstrating the
 importance of accounting for microclimate variation <span class="citation">(Bramer et al., 2018; Bütikofer et al., 2020;
 Lembrechts et al., 2019)</span>. Acute thermal stress events are often
 more relevant to the physiology and energy balance of organisms than
@@ -469,14 +471,14 @@ and visualization tools to Translate Environmental Change into
 organismal responses.</p>
 <p>The mathematical tools for leveraging environmental data to predict
 organismal conditions have long lingered in books <span class="citation">(Campbell &amp; Norman, 2000; Gates, 1980)</span> and
-articles <span class="citation">(W. P. Porter &amp; Gates, 1969; W. P.
-Porter &amp; Tracy, 1983)</span>, but adoption of these tools has not
-kept pace with research on climate change responses. In recent decades,
-adoption of biophysical approaches is expanding with recognition of the
-importance of spatial and temporal environmental variation to
-determining climate change responses <span class="citation">(Buckley et
-al., 2018; M. R. Kearney &amp; Porter, 2017)</span> and the increased
-dissemination of computational tools.</p>
+articles <span class="citation">(Porter &amp; Gates, 1969; Porter &amp;
+Tracy, 1983)</span>, but adoption of these tools has not kept pace with
+research on climate change responses. In recent decades, adoption of
+biophysical approaches is expanding with recognition of the importance
+of spatial and temporal environmental variation to determining climate
+change responses <span class="citation">(Buckley et al., 2018; Kearney
+&amp; Porter, 2017)</span> and the increased dissemination of
+computational tools.</p>
 <p>Estimating how organisms experience their thermal environment
 generally entails two classes of models <span class="citation">(Campbell
 &amp; Norman, 2000; Gates, 1980)</span> (Figure 1). Microclimate models
@@ -491,13 +493,13 @@ exchanges between organisms and their environment.</p>
 <p><strong>Figure 1</strong> A) Microclimate models scale air and soil
 temperatures and wind speeds from sensor to organismal heights. B)
 Biophysical models balance heat exchanges between organisms and their
-environment to estimate body temperatures <span class="citation">(W.
-Porter et al., 1973)</span>. A thermal image depicts how grasshopper
-body temperatures vary substantially from vegetation, air, and ground
+environment to estimate body temperatures <span class="citation">(Porter
+et al., 1973)</span>. A thermal image depicts how grasshopper body
+temperatures vary substantially from vegetation, air, and ground
 temperatures due to heat exchange.</p>
 <p>The TrenchR package is intended to complement the NicheMapR package,
-which includes sophisticated microclimate <span class="citation">(M. R.
-Kearney &amp; Porter, 2017)</span> and biophysical <span class="citation">(M. R. Kearney &amp; Porter, 2020)</span> models.
+which includes sophisticated microclimate <span class="citation">(Kearney &amp; Porter, 2017)</span> and biophysical
+<span class="citation">(Kearney &amp; Porter, 2020)</span> models.
 Although the Fortran source code was recently released, the complexity
 of NicheMapR functions can make it difficult to understand and modify
 the source code. The function documentation including variable
@@ -618,10 +620,10 @@ tutorials (which originated from an NSF training grant in 1979 and
 lacked broad distribution) to include R code and utilization of TrenchR
 functions. We expanded the original series to include tutorials
 contributed by M. Kearney introducing the Microclim environmental data
-<span class="citation">(M. R. Kearney et al., 2014)</span> and
-integrating the Microclim data with biophysical modeling to examine
-broad scale climatic limits. The tutorials are provided in html form and
-available for download as a pdf at the bookdown server (<a href="https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/" class="uri">https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/</a>).
+<span class="citation">(Kearney et al., 2014)</span> and integrating the
+Microclim data with biophysical modeling to examine broad scale climatic
+limits. The tutorials are provided in html form and available for
+download as a pdf at the bookdown server (<a href="https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/" class="uri">https://bookdown.org/huckley/Physical_Processes_In_Ecosystems/</a>).
 R markdown files for the tutorials are available in Github (<a href="https://github.com/trenchproject/TrenchRmodules" class="uri">https://github.com/trenchproject/TrenchRmodules</a>).</p>
 </div>
 </div>
@@ -629,9 +631,9 @@ R markdown files for the tutorials are available in Github (<a href="https://git
 <h2>Example Application</h2>
 <p>We illustrate the use of the TrenchR package by estimating an energy
 budget for a <em>Sceloporus</em> lizard on June 1, 2021 in Santa Fe, New
-Mexico, USA (35.69<span class="math inline">\(^\circ\)</span>,
--105.944<span class="math inline">\(^\circ\)</span>, elevation: 2121 m).
-The example is also incorporated in the <em>Using energy balances to
+Mexico, USA (35.69<span class="math inline">\(^\circ\)</span>N,
+-105.944<span class="math inline">\(^\circ\)</span>W, elevation: 2121
+m). The example is also incorporated in the <em>Using energy balances to
 estimate body temperatures</em> vignette. We start by generating
 environmental inputs (Figure 2). Using these inputs, we estimate the
 energy budget with component functions. Finally, we use an integrated
@@ -654,8 +656,8 @@ estimation of <span class="math inline">\(T_b\)</span> assumes thermal
 equilibrium.</p>
 <p>Let us assume the lizard is in an unshaded location where a weather
 station at standard height (2 meters) reports that the daily air
-temperature varies from a minimum of 10<span class="math inline">\(^\circ\)</span>C to a maximum of 25<span class="math inline">\(^\circ\)</span>C and the wind speed averages 1
-m/s. The soil surface temperature varies from a minimum of 15<span class="math inline">\(^\circ\)</span>C to a maximum of 30<span class="math inline">\(^\circ\)</span>C. We assume that atmospheric
+temperature varies from a minimum of 10 <span class="math inline">\(^\circ\)</span>C to a maximum of 25 <span class="math inline">\(^\circ\)</span>C and the wind speed averages 1
+m/s. The soil surface temperature varies from a minimum of 15 <span class="math inline">\(^\circ\)</span>C to a maximum of 30 <span class="math inline">\(^\circ\)</span>C. We assume that atmospheric
 transmissivity <span class="math inline">\(\tau = 0.7\)</span> and
 albedo <span class="math inline">\(\rho = 0.6\)</span>.</p>
 <div id="environmental-data" class="section level3">
@@ -900,9 +902,9 @@ Simple functions can be combined as needed to produce comprehensive and
 transparent models for biophysical ecology and evolution. The resultant
 models are likely to be sufficiently detailed for many applications, but
 users are referred to NicheMapR for more detailed biophysical models
-<span class="citation">(M. R. Kearney &amp; Porter, 2017, 2020)</span>.
-We focus on models that predict equilibrium conditions for simplicity
-(that is, steady-state conditions). Such models generally do not present
+<span class="citation">(Kearney &amp; Porter, 2017, 2020)</span>. We
+focus on models that predict equilibrium conditions for simplicity (that
+is, steady-state conditions). Such models generally do not present
 computational challenges so our models are not optimized for
 computational efficiency. Making classic biophysical ecology techniques
 more accessible will allow researchers to take advantage of rapidly
@@ -1008,7 +1010,7 @@ biophysical modelling: The ectotherm and dynamic energy budget models.
 <em>Ecography</em>, <em>43</em>(1), 85–96.
 </div>
 <div id="ref-kearney2009" class="csl-entry">
-Kearney, M., Shine, R., &amp; Porter, W. P. (2009). The potential for
+Kearney, M. R., Shine, R., &amp; Porter, W. P. (2009). The potential for
 behavioral thermoregulation to buffer <span>“cold-blooded”</span>
 animals against climate warming. <em>Proceedings of the National Academy
 of Sciences</em>, <em>106</em>(10), 3835–3840.
@@ -1047,15 +1049,15 @@ Porter, W. P., &amp; Gates, D. M. (1969). Thermodynamic equilibria of
 animals with environment. <em>Ecological Monographs</em>,
 <em>39</em>(3), 227–244.
 </div>
+<div id="ref-porter1973behavioral" class="csl-entry">
+Porter, W. P., Mitchell, J. W., Beckman, W. A., &amp; DeWitt, C. B.
+(1973). Behavioral implications of mechanistic ecology.
+<em>Oecologia</em>, <em>13</em>(1), 1–54.
+</div>
 <div id="ref-porter1983biophysical" class="csl-entry">
 Porter, W. P., &amp; Tracy, C. R. (1983). Biophysical analyses of
 energetics, time-space utilization, and distributional limits.
 <em>Lizard Ecology: Studies of a Model Organism</em>, 55–83.
-</div>
-<div id="ref-porter1973behavioral" class="csl-entry">
-Porter, W., Mitchell, J., Beckman, W., &amp; DeWitt, C. (1973).
-Behavioral implications of mechanistic ecology. <em>Oecologia</em>,
-<em>13</em>(1), 1–54.
 </div>
 <div id="ref-potter2013microclimatic" class="csl-entry">
 Potter, K. A., Arthur Woods, H., &amp; Pincebourde, S. (2013).
