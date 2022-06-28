@@ -73,7 +73,9 @@ Biophysical models estimate body temperatures using an energy budget to balance 
 knitr::include_graphics('./figures/TrenchRBiophys.png')
 ```
 
-**Figure 1** A) Microclimate models scale air and soil temperatures and wind speeds from sensor to organismal heights. B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. A thermal image depicts how grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
+**Figure 1** A) Microclimate models scale air and soil temperatures and wind speeds from sensor to organismal heights. 
+B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. 
+A thermal image depicts how grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
 
 The TrenchR package is intended to complement the NicheMapR package, which includes sophisticated microclimate [@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Although the Fortran source code was recently released, the complexity of NicheMapR functions can make it difficult to understand and modify the source code. 
 The function documentation including variable definitions and units can also be challenging to follow. 
