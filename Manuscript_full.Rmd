@@ -483,7 +483,6 @@ We particularly thank M. Kearney for extensive input on TrenchR and its alignmen
 LB conceived and designed the package and lead all aspect of the packages creation and dissemination. All authors wrote and edited functions and associated package resources, contributed critically to manuscript drafts, and gave final approval for publication. AJ and JS configured the package. AM, BBO, YS, and LB converted and edited the educational modules. 
 
 ## Data Availability
-
-All code and data are available at <https://github.com/trenchproject/TrenchR>.
+TrenchR is available at <https://github.com/trenchproject/TrenchR>. All text, code, and data for this manuscript are available at <https://github.com/trenchproject/TrenchRmanuscript/>.
 
 ## References
