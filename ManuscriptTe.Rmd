@@ -20,12 +20,10 @@ library(ggplot2)
 library(reshape)
 ```
 
-# APPENDIX S1
-
 We provide an additional example using microclimate data measured along an elevation gradient in CO, USA to illustrate use of TrenchR. 
 We first use a time series of air temperatures and wind speeds collected at multiple heights to examine profiles and surface roughness. 
-We then use a time series of air and surface temperatures, wind speeds, and solar radiation collected at a single height to implement a biophysical model for grasshoppers and compare estimates to observations. 
-R markdown files with the full code and the associated data are available at https://github.com/trenchproject/TrenchRmanuscript/. 
+We then use a time series of air and surface temperatures, wind speeds, and solar radiation collected at a single height to implement a biophysical model for grasshoppers and compare estimates to observations. We omit the code to read and process the environmental data here for brevity. 
+R markdown files with the full code and the associated environmental data are available at https://github.com/trenchproject/TrenchRmanuscript/. 
 
 # Microclimate Models
 
@@ -47,15 +45,13 @@ C1.hr= as.matrix(C1.hr)
 ```
 
 We first examine how temperature and wind speed profiles can be used to scale conditions to the heights of organisms. 
-We start by using wind speed variation across hours and heights to estimate surface roughness.
+We start by using wind speeds ($u_r$, m/s) at a vector of reference heights ($z_r$, m) to estimate surface roughness ($z_0$).
 
 ```{r}
-#estimate surface roughness based on wind velocity (m/s) at a vector of reference heights, zr (m)
 z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.0,1.5))
-
 ```
 
-We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR.
+We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR that assume both neutral and forced flows and treat the profile as a single or multiple segments. The functions require temperatures ($T_r$, $^\circ$C) and wind speeds ($U_r$, $m s^{-1}$) at reference heights ($z_r$, $m$), $z_0$, surface temperature ($T_s$, $^\circ$C), and the desired height for scaling ($z$, m).
 
 ```{r}
 #subset to day and hour
@@ -65,11 +61,6 @@ hr=10
 #vector of heights
 z.seq <- seq(0, 2, by = 0.1)
 
-#estimate profiles using three different functions including the assumption of neutral and segmented profiles. 
-#T_r	and u_r are temperatures (C) and windspeeds (m/s), respectively, at reference height zr (m).
-#z0	is surface roughness (m); z is the height to scale to (m).
-#T_s	is surface temperature (C).
-
 #temperature profiles
 t.seq1= sapply(z.seq, FUN=air_temp_profile_neutral, T_r=C1.sub[hr,"Air0.5m"], z0=z0[hr], zr=0.5, T_s=C1.sub[hr,"Soil"])
 
@@ -77,16 +68,13 @@ t.seq2= sapply(z.seq, FUN=air_temp_profile, T_r=C1.sub[hr,"Air0.5m"], u_r=C1.hr[
 
 t.seq3= sapply(z.seq, FUN=air_temp_profile_segment, T_r=C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")],u_r=C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=rep(z0[hr],4), T_s=C1.sub[hr,"Soil"])
 
-#windspeed profiles
+#wind speed profiles
 u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
 
-#u.seq2= sapply(z.seq, FUN=wind_speed_profile, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
-
-u.seq3= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
+u.seq2= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
 ```
 
 The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground (Figure S1). 
-Profiles can be fit as a single smooth function or segments.
 
 ```{r, echo=FALSE}
 #replace infinity with N
@@ -98,12 +86,11 @@ points(t.seq3, z.seq, type = "l", lty="dotted")
 points(C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 
 plot(u.seq1, z.seq, type = "l", xlab = "windspeed (m/s)", ylab = "z (height above ground in m)")
-#points(u.seq2, z.seq, type = "l", lty="dashed")
-points(u.seq3, z.seq, type = "l", lty="dotted")
+points(u.seq2, z.seq, type = "l", lty="dotted")
 points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
 ```
 
-*Figure S1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: air_temp_profile_neutral(); dashed: air_temp_profile()] and segmented estimation [dotted: air_temp_profile_segment()]. 
+*Figure S1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: `air_temp_profile_neutral()`; dashed: `air_temp_profile()`] and segmented estimation [dotted: `air_temp_profile_segment()`]. 
 The points indicate empirical points used for parameterization.*
 
 # Biophysical models
@@ -144,23 +131,23 @@ dat= subset(dataug, dataug$Rad>5)
 ```
 
 We next illustrate quantifying operative environmental temperatures, which are estimated body temperatures for grasshoppers in the specified environments. 
-We read and process time series of environmental data to estimate the zenith angle, the angle between the sun's rays and the vertical, across days of the year and hours.
+Assuming we have read and processed the time series of environmental data, we first estimate the zenith angle ($psi$, $^\circ$), the angle between the sun's rays and the vertical, as a function of day of year ($doy$), latitude ($lat$, $^\circ$), longitude ($lon$, $^\circ$), and hour.
 
 ```{r}
-#Calculate zenith
-dat$psi= zenith_angle(dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
+
+dat$psi= zenith_angle(doy=dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
 
 ```
 
-We scale the air temperature and wind speed from a reference height of 0.5m to grasshopper height (0.001m).
+We scale the air temperature ($T_r$, $^\circ$C) and wind speed ($u_r$, m/s) from a reference height of $z_r$=0.5m to grasshopper height ($z$=0.001m). The functions also require surface temperature ($T_s$, $^\circ$C), and surface roughness ($z0$, m).
 
 ```{r}
 z<-0.001 #specify distance from ground 
 
-#scale temperature T_r from reference height zr=0.5m to grasshopper height based on windspeed u_r, surface temperature T_s, and surface roughness z0.
+#scale temperature 
 dat$Tgrass <- air_temp_profile(T_r=dat$Temp, u_r=dat$Wind, zr=0.5, z0=0.02, z=z, T_s=dat$SoilTemp)
 
-#scale wind to grasshopper height
+#scale wind speed
 dat$Ugrass= wind_speed_profile_neutral(u_r=dat$Wind, zr=0.5, z0=0.02,z=z)
 ```
 
@@ -170,19 +157,12 @@ dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour",
 dat= na.omit(dat)
 ```
 
-We then use biophysical models to estimate body temperatures based on air and surface temperatures, wind speed, and solar radiation. We first use a biophysical model specifically configured for grasshoppers.
+We then use biophysical models to estimate body temperatures ($T_b$, $^\circ$C) based on air ($T_a$, $^\circ$C) and surface temperatures ($T_g$, $^\circ$C), wind speed ($u$, m/s), and solar radiation ($H$, $W m^{-2}$). We first use a biophysical model specifically configured for grasshoppers where $K_t$	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere; $l$	is grasshopper length (m); $A_{condfact}$ is the proportion of the grasshopper surface area in contact with the ground; $abs$ is absorptivity of grasshopper to solar radiation (proportion, $abs$=0.9 corresponds to dark colors); and $r_g$ is substrate solar reflectivity (proportion).
+
 ```{r, warning=FALSE}
 
-##Calculate operative temperature, Te
 dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, l=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
 
-#T_a	and T_g are air and surface temperatures (C), respectively; u	is wind speed (m/s); 
-#H is total (direct + diffuse) solar radiation flux (W/m^2);
-#K_t	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere;
-#psi is solar zenith angle (degrees); l	is grasshopper length (m);
-#Acondfact is the proportion of the grasshopper surface area in contact with the ground;
-#abs is absorptivity of grasshopper to solar radiation (proportion); abs=0.9 corresponds to dark colors.
-#r_g is substrate solar reflectivity (proportion).
 ```
 
 ```{r, include=FALSE}
@@ -193,40 +173,30 @@ dat$Te[dat$Te>100]<-NA
 ```
 
 We then implement a generic energy budget. 
-We first illustrate the estimation of convective heat transfer coefficients as a function of wind speed.
+We first illustrate the estimation of convective heat transfer coefficients ($H_L$, $W K^{-1} m^{-2}$) as a function of wind speed ($V$, $m s^{-1}$) based on empirical measurements, where $D$ is the characteristic dimension (m), $K$ is the thermal conductivity of air ($W m^{-1} K^{-1}$), and $nu$ is the kinematic viscosity of air ($m^2 s^{-1}$). We subsequently estimate $H_L$ using a spherical approximation and a simplified version of the approximation, respectively.
 
 ```{r}
-#Estimate heat transfer coefficient using empirical relationship
 dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxon="cylinder")
-#where V is	air velocity (m/s); D is the characteristic dimension (m);
-#K is the thermal conductivity of air (W m^-1 K^-1);
-#nu is the kinematic viscosity of air (m^2 s^-1)
 
-#Also estimate using a spherical approximation and a simplified version of the approximation.
 H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxon="flyinginsect")
+
 H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211, type="Gates")
 
-#surface area from length(m)
-A= surface_area_from_length(l=0.0211)
 ```
 
-We then implement the energy budget as follows. 
-We note that the energy budget can not be solved for some time periods and errors are generated.
+We then implement the energy budget as follows, where $A$ is surface area ($m^2$), $Q_{abs}$ is the solar and thermal radiation absorbed (W), $epsilon$ is longwave infrared emissivity of skin (proportion), and $ef$ is the enhancement factor that is used to adjust $H_L$ to field conditions. The proportions $psa_{dir}$, $psa_{ref}$, $psa_{air}$, and $psa_{g}$ are the proportions surface area exposed to direct radiation from the sky (or enclosure), reflected radiation from the ground, and air, and in contact with the ground, respectively. We note that the energy budget can not be solved for some time periods and errors are generated.
 
 ```{r echo=T, results = 'hide', warning=FALSE}
 TeGates= rep(NA, nrow(dat) )
+
+A= surface_area_from_length(l=0.0211) #surface area from length(m)
 
 for(ind in 1:nrow(dat) ){
 
   out= try(Tb_Gates(A=A, D=0.0211/3, psa_dir=0.5, psa_ref=1-0.5, psa_air=1, psa_g=0.0, T_g=dat$SoilTemp[ind]+273, T_a=dat$Tgrass[ind]+273, Qabs=A*0.66*dat$Rad[ind], epsilon=0.95, H_L=dat$H_L[ind], ef=1.3, K=0.15), silent=TRUE)
   if(is.numeric(out))TeGates[ind]=out
 }
-#where psa_dir, psa_ref, psa_air, psa_g are the proportions surface area exposed to direct radiation from the sky (or enclosure), reflected radiation from the ground, and air, and in contact with the ground, respectively;
-#Qabs is the solar and thermal radiation absorbed (W);
-#epsilon is longwave infrared emissivity of skin (proportion);
-#H_L is the convective heat transfer coefficient (W m^-2 K^-1);
-#ef	is the enhancement factor, used to adjust H_L to field conditions;
-#K is thermal conductivity. 
+
 ```
 
 We aggregate the data and plot average conditions across sites (Figure S2). 
@@ -270,7 +240,7 @@ ggplot(data=dat.pl, aes(x=hour, y = value, color=variable))+geom_line(aes(lty=va
 
 ```
 
-*Figure S2. Diurnal temperature variation averaged across days in August varies across the elevations of CO sites (panels) and the type of temperature (C). 
+*Figure S2. Diurnal temperature variation averaged across days in August varies across the elevations of CO sites (panels) and the type of temperature ($^\circ$C). 
 Microclimate models indicate that the air temperatures experienced by grasshoppers near the ground (Ta grasshopper height) is generally above air temperatures (Ta) and close to surface temperatures (Ts). 
 Body temperatures estimated by a grasshopper specific biophysical model (Te) are fairly similar to but sometimes less than the body temperatures of a physical grasshopper model implanted with a thermistor (Te observed). 
 The general biophysical models that makes simplifying assumptions (Te Gates) tends to overestimate body temperatures.*
