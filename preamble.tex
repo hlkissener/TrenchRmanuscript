@@ -1,8 +1,12 @@
 \usepackage{xcolor}
 \definecolor{backgroundgrey}{RGB}{235,235,235}
+\definecolor{commentbrown}{RGB}{102,102,0}
 
 \lstset{
   breaklines=true,
   language=R,
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  commentstyle=\color{commentbrown},
   backgroundcolor=\color{backgroundgrey}
 }

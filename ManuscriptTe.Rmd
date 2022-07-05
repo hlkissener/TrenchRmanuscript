@@ -3,9 +3,11 @@ title: "Appendix S1"
 author: "Buckley et al."
 output:
   html_document: default
-  pdf_document: default
   word_document: default
-  rmarkdown::html_vignette: default
+  pdf_document: 
+    pandoc_args: --listings
+    includes:
+      in_header: preamble.tex
 ---
 
 ```{r setup, include=FALSE}
@@ -28,66 +30,66 @@ R markdown files with the full code and the associated environmental data are av
 # Microclimate Models
 
 ```{r, include=FALSE}
-C1all=read.csv("./data/microclimate_C1.csv", sep=",", na.strings = c("-49.99","NA"))
+C1all <- read.csv("./data/microclimate_C1.csv", sep = ",", na.strings = c("-49.99","NA"))
 ```
 
 ```{r, include=FALSE}
-#ANALYZE SURFACE ROUGHNESS AND PROFILES
-C1all$day=as.POSIXlt(as.character(C1all$datetime), tz='MST', format="%m/%d/%Y %H:%M")$mday
-C1all$hour=as.POSIXlt(as.character(C1all$datetime), tz='MST', format="%m/%d/%Y %H:%M")$hour 
+# ANALYZE SURFACE ROUGHNESS AND PROFILES
+C1all$day <- as.POSIXlt(as.character(C1all$datetime), tz = 'MST', format = "%m/%d/%Y %H:%M")$mday
+C1all$hour <- as.POSIXlt(as.character(C1all$datetime), tz = 'MST', format = "%m/%d/%Y %H:%M")$hour 
 
-C1.dayhr<- aggregate(C1all[,c(2:8,13:22)], by=list(C1all$day, C1all$hour), FUN=mean, na.rm=TRUE)
-names(C1.dayhr)[1:2]=c("day","hour")
-C1.hr<- aggregate(C1all[,c(2:8,13:22)], by=list(C1all$hour), FUN=mean, na.rm=TRUE)
-names(C1.hr)[1]="hour"
+C1.dayhr <- aggregate(C1all[,c(2:8,13:22)], by = list(C1all$day, C1all$hour), FUN = mean, na.rm = TRUE)
+names(C1.dayhr)[1:2] <- c("day","hour")
+C1.hr <- aggregate(C1all[,c(2:8,13:22)], by = list(C1all$hour), FUN = mean, na.rm = TRUE)
+names(C1.hr)[1] <- "hour"
 
-C1.hr= as.matrix(C1.hr)
+C1.hr <- as.matrix(C1.hr)
 ```
 
 We first examine how temperature and wind speed profiles can be used to scale conditions to the heights of organisms. 
 We start by using wind speeds ($u_r$, m/s) at a vector of reference heights ($z_r$, m) to estimate surface roughness ($z_0$).
 
 ```{r}
-z0= apply(C1.hr[, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], FUN=surface_roughness, MARGIN=1, zr=c(0.25,0.5,1.0,1.5))
+z0 <- apply(C1.hr[, c("Wind0.25m", "Wind0.5m", "Wind1m", "Wind1.5m")], FUN = surface_roughness, MARGIN = 1, zr = c(0.25, 0.5, 1.0, 1.5))
 ```
 
 We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR that assume both neutral and forced flows and treat the profile as a single or multiple segments. The functions require temperatures ($T_r$, $^\circ$C) and wind speeds ($U_r$, $m s^{-1}$) at reference heights ($z_r$, $m$), $z_0$, surface temperature ($T_s$, $^\circ$C), and the desired height for scaling ($z$, m).
 
 ```{r}
-#subset to day and hour
-C1.sub= subset(C1.dayhr, C1.dayhr$day==10)
-hr=10
+# subset to day and hour
+C1.sub <- subset(C1.dayhr, C1.dayhr$day == 10)
+hr <- 10
 
-#vector of heights
+# vector of heights
 z.seq <- seq(0, 2, by = 0.1)
 
-#temperature profiles
-t.seq1= sapply(z.seq, FUN=air_temp_profile_neutral, T_r=C1.sub[hr,"Air0.5m"], z0=z0[hr], zr=0.5, T_s=C1.sub[hr,"Soil"])
+# temperature profiles
+t.seq1 <- sapply(z.seq, FUN = air_temp_profile_neutral, T_r = C1.sub[hr, "Air0.5m"], z0 = z0[hr], zr = 0.5, T_s = C1.sub[hr, "Soil"])
 
-t.seq2= sapply(z.seq, FUN=air_temp_profile, T_r=C1.sub[hr,"Air0.5m"], u_r=C1.hr[hr,"Wind0.5m"], zr=0.5, z0=z0[hr], T_s=C1.sub[hr,"Soil"])
+t.seq2 <- sapply(z.seq, FUN = air_temp_profile, T_r = C1.sub[hr, "Air0.5m"], u_r = C1.hr[hr, "Wind0.5m"], zr = 0.5, z0 = z0[hr], T_s = C1.sub[hr, "Soil"])
 
-t.seq3= sapply(z.seq, FUN=air_temp_profile_segment, T_r=C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")],u_r=C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.25,0.5,1,1.5), z0=rep(z0[hr],4), T_s=C1.sub[hr,"Soil"])
+t.seq3 <- sapply(z.seq, FUN = air_temp_profile_segment, T_r = C1.sub[hr, c("Air0.25m", "Air0.5m", "Air1.0m", "Air1.5m")], u_r = C1.sub[hr,  c("Wind0.25m", "Wind0.5m", "Wind1m", "Wind1.5m")], zr=c(0.25, 0.5, 1, 1.5), z0 = rep(z0[hr], 4), T_s = C1.sub[hr, "Soil"])
 
-#wind speed profiles
-u.seq1= sapply(z.seq, FUN=wind_speed_profile_neutral, u_r=C1.sub[hr,"Wind0.5m"], zr=0.5, z0=z0[hr])
+# wind speed profiles
+u.seq1 <- sapply(z.seq, FUN = wind_speed_profile_neutral, u_r = C1.sub[hr, "Wind0.5m"], zr = 0.5, z0 = z0[hr])
 
-u.seq2= sapply(z.seq, FUN=wind_speed_profile_segment, u_r=C1.sub[hr, c("Wind0.5m","Wind1m","Wind1.5m")], zr=c(0.5,1,1.5), z0=rep(z0[hr],3))
+u.seq2 <- sapply(z.seq, FUN = wind_speed_profile_segment, u_r = C1.sub[hr, c("Wind0.5m", "Wind1m", "Wind1.5m")], zr = c(0.5, 1, 1.5), z0 = rep(z0[hr], 3))
 ```
 
 The temperature and wind speed profiles illustrate how temperatures generally decrease and wind speeds generally increase with height above the ground (Figure S1). 
 
-```{r, echo=FALSE}
-#replace infinity with N
-t.seq1[which(!is.finite(t.seq1))]=NA
+```{r, echo=FALSE, fig.height=4, fig.align = 'center', out.width = "75%"}
+# replace infinity with N
+t.seq1[which(!is.finite(t.seq1))] <- NA
 
 plot(t.seq1, z.seq, type = "l", xlab = "Temperature (C)", ylab = "z (height above ground in m)")
-points(t.seq2, z.seq, type = "l", lty="dashed")
-points(t.seq3, z.seq, type = "l", lty="dotted")
-points(C1.sub[hr, c("Air0.25m","Air0.5m","Air1.0m","Air1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
+points(t.seq2, z.seq, type = "l", lty = "dashed")
+points(t.seq3, z.seq, type = "l", lty = "dotted")
+points(C1.sub[hr, c("Air0.25m", "Air0.5m", "Air1.0m", "Air1.5m")], c(0.25, 0.5, 1, 1.5), type = "p", col = "red")
 
 plot(u.seq1, z.seq, type = "l", xlab = "windspeed (m/s)", ylab = "z (height above ground in m)")
-points(u.seq2, z.seq, type = "l", lty="dotted")
-points(C1.sub[hr, c("Wind0.25m","Wind0.5m","Wind1m","Wind1.5m")], c(0.25,0.5,1,1.5), type = "p", col="red")
+points(u.seq2, z.seq, type = "l", lty = "dotted")
+points(C1.sub[hr, c("Wind0.25m", "Wind0.5m", "Wind1m", "Wind1.5m")], c(0.25, 0.5, 1, 1.5), type = "p", col = "red")
 ```
 
 *Figure S1. Temperature (top) and wind speed (bottom) profiles using similar continuous [solid: `air_temp_profile_neutral()`; dashed: `air_temp_profile()`] and segmented estimation [dotted: `air_temp_profile_segment()`]. 
@@ -96,38 +98,39 @@ The points indicate empirical points used for parameterization.*
 # Biophysical models
 ```{r, include=FALSE}
 #Grasshopper data
-spec.dat=read.csv("./data/SpecData.csv")
+spec.dat <- read.csv("./data/SpecData.csv")
 
-#read weather data
-dat=read.csv("./data/DatAll_Pace2011.csv", sep=",", na.strings = c("-49.99","NA"))
+# read weather data
+dat <- read.csv("./data/DatAll_Pace2011.csv", sep = ",", na.strings = c("-49.99", "NA"))
 #match site data
-sites=read.csv("./data/SiteElevations.csv", sep=",")
+sites <- read.csv("./data/SiteElevations.csv", sep= ",")
 
-#combine soil temperatures
-dat$SoilTemp= rowMeans(dat[,c("SoilTemp","SoilTemperature")], na.rm = TRUE) 
+# combine soil temperatures
+dat$SoilTemp <- rowMeans(dat[,c("SoilTemp", "SoilTemperature")], na.rm = TRUE) 
 
-#omit problematic temperatures
-dat$Temp[dat$Temp< -10]=NA
+# omit problematic temperatures
+dat$Temp[dat$Temp< -10] <- NA
 
-#add elevation
-match1= match(dat$site, sites$Site)
-dat$Elev=sites[match1,"Elevation"]
+# add elevation
+match1 <- match(dat$site, sites$Site)
+dat$Elev <- sites[match1, "Elevation"]
 
-#calculate day of year
-date.ct <- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST")
-dat$J= round(as.numeric(julian(date.ct, origin = as.Date("2011-01-01") )))
-dat$hour= date.ct$hour
+# calculate day of year
+date.ct <- strptime(dat$datetime, format = "%m/%d/%Y %H:%M", tz = "MST")
+dat$J <- round(as.numeric(julian(date.ct, origin = as.Date("2011-01-01"))))
+dat$hour <- date.ct$hour
 
-#match site data
-match1= match(dat$site, sites$Site) 
-dat$lon= sites$Lon[match1]
-dat$lat= sites$Lat[match1]
+# match site data
+match1 <- match(dat$site, sites$Site) 
+dat$lon <- sites$Lon[match1]
+dat$lat <- sites$Lat[match1]
 
-#Subset to August
-dat.dt<- strptime(dat$datetime, format="%m/%d/%Y %H:%M", tz="MST") #as.Date
-dataug= subset(dat, dat.dt$mon==7)
-#subset to day
-dat= subset(dataug, dataug$Rad>5)
+# Subset to August
+dat.dt<- strptime(dat$datetime, format = "%m/%d/%Y %H:%M", tz = "MST") # as.Date
+dataug <- subset(dat, dat.dt$mon == 7)
+
+# subset to day
+dat <- subset(dataug, dataug$Rad > 5)
 ```
 
 We next illustrate quantifying operative environmental temperatures, which are estimated body temperatures for grasshoppers in the specified environments. 
@@ -135,66 +138,72 @@ Assuming we have read and processed the time series of environmental data, we fi
 
 ```{r}
 
-dat$psi= zenith_angle(doy=dat$J,lat=dat$lat, lon=dat$lon, hour=dat$hour)
+dat$psi <- zenith_angle(doy = dat$J, lat = dat$lat, lon = dat$lon, hour = dat$hour)
 
 ```
 
-We scale the air temperature ($T_r$, $^\circ$C) and wind speed ($u_r$, m/s) from a reference height of $z_r$=0.5m to grasshopper height ($z$=0.001m). The functions also require surface temperature ($T_s$, $^\circ$C), and surface roughness ($z0$, m).
+We scale the air temperature ($T_r$, $^\circ$C) and wind speed ($u_r$, m/s) from a reference height of $z_r$ = 0.5m to grasshopper height ($z$ = 0.001m). The functions also require surface temperature ($T_s$, $^\circ$C), and surface roughness ($z0$, m).
 
 ```{r}
-z<-0.001 #specify distance from ground 
+z <- 0.001 #specify distance from ground 
 
-#scale temperature 
-dat$Tgrass <- air_temp_profile(T_r=dat$Temp, u_r=dat$Wind, zr=0.5, z0=0.02, z=z, T_s=dat$SoilTemp)
+# scale temperature 
+dat$Tgrass <- air_temp_profile(T_r = dat$Temp, u_r = dat$Wind, zr = 0.5, z0 = 0.02, z = z, T_s = dat$SoilTemp)
 
-#scale wind speed
-dat$Ugrass= wind_speed_profile_neutral(u_r=dat$Wind, zr=0.5, z0=0.02,z=z)
+# scale wind speed
+dat$Ugrass <- wind_speed_profile_neutral(u_r = dat$Wind, zr = 0.5, z0 = 0.02, z = z)
 ```
 
 ```{r, include=FALSE}
-#cut NAs
-dat= dat[,c("Rad","Temp","Wind","SoilTemp","SanguinipesTemp","Elev","J", "hour","psi","Tgrass","Ugrass")]
-dat= na.omit(dat)
+# cut NAs
+dat <- dat[,c("Rad", "Temp", "Wind", "SoilTemp", "SanguinipesTemp", "Elev", "J", "hour", "psi", "Tgrass", "Ugrass")]
+dat <- na.omit(dat)
 ```
 
 We then use biophysical models to estimate body temperatures ($T_b$, $^\circ$C) based on air ($T_a$, $^\circ$C) and surface temperatures ($T_g$, $^\circ$C), wind speed ($u$, m/s), and solar radiation ($H$, $W m^{-2}$). We first use a biophysical model specifically configured for grasshoppers where $K_t$	is the clearness index (dimensionless), which is the ratio of the global solar radiation measured at the surface to the total solar radiation at the top of the atmosphere; $l$	is grasshopper length (m); $A_{condfact}$ is the proportion of the grasshopper surface area in contact with the ground; $abs$ is absorptivity of grasshopper to solar radiation (proportion, $abs$=0.9 corresponds to dark colors); and $r_g$ is substrate solar reflectivity (proportion).
 
 ```{r, warning=FALSE}
 
-dat$Te<-Tb_grasshopper(T_a=dat$Tgrass, T_g=dat$SoilTemp, u=dat$Ugrass, H=dat$Rad, K_t=1, psi=dat$psi, l=0.0211, Acondfact=0.0, abs=0.9, r_g=0.5) 
+dat$Te <- Tb_grasshopper(T_a = dat$Tgrass, T_g = dat$SoilTemp, u = dat$Ugrass, H = dat$Rad, K_t = 1, psi = dat$psi, l = 0.0211, Acondfact = 0.0, abs = 0.9, r_g = 0.5) 
 
 ```
 
 ```{r, include=FALSE}
-#fix infinite
-dat$Te[is.infinite(dat$Te)]<-NA
-#ditch big numbers for now
-dat$Te[dat$Te>100]<-NA
+# fix infinite
+dat$Te[is.infinite(dat$Te)] <- NA
+
+# ditch big numbers for now
+dat$Te[dat$Te>100] <- NA
 ```
 
 We then implement a generic energy budget. 
 We first illustrate the estimation of convective heat transfer coefficients ($H_L$, $W K^{-1} m^{-2}$) as a function of wind speed ($V$, $m s^{-1}$) based on empirical measurements, where $D$ is the characteristic dimension (m), $K$ is the thermal conductivity of air ($W m^{-1} K^{-1}$), and $nu$ is the kinematic viscosity of air ($m^2 s^{-1}$). We subsequently estimate $H_L$ using a spherical approximation and a simplified version of the approximation, respectively.
 
 ```{r}
-dat$H_L=heat_transfer_coefficient(V=dat$Ugrass,D=0.0211,K=0.025, nu= 15.3 * 10^(-6) , taxon="cylinder")
+dat$H_L <- heat_transfer_coefficient(V = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6) , taxon = "cylinder")
 
-H_L1= heat_transfer_coefficient_approximation(V=dat$Ugrass,D=0.0211,K= 0.025, nu= 15.3 * 10^(-6), taxon="flyinginsect")
+H_L1 <- heat_transfer_coefficient_approximation(V = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6), taxon = "flyinginsect")
 
-H_L2= heat_transfer_coefficient_simple(V=dat$Ugrass,D=0.0211, type="Gates")
+H_L2 <- heat_transfer_coefficient_simple(V = dat$Ugrass, D = 0.0211, type = "Gates")
 
 ```
 
 We then implement the energy budget as follows, where $A$ is surface area ($m^2$), $Q_{abs}$ is the solar and thermal radiation absorbed (W), $epsilon$ is longwave infrared emissivity of skin (proportion), and $ef$ is the enhancement factor that is used to adjust $H_L$ to field conditions. The proportions $psa_{dir}$, $psa_{ref}$, $psa_{air}$, and $psa_{g}$ are the proportions surface area exposed to direct radiation from the sky (or enclosure), reflected radiation from the ground, and air, and in contact with the ground, respectively. We note that the energy budget can not be solved for some time periods and errors are generated.
 
-```{r echo=T, results = 'hide', warning=FALSE}
-TeGates= rep(NA, nrow(dat) )
+```{r, message=FALSE}
+TeGates <- rep(NA, nrow(dat))
 
-A= surface_area_from_length(l=0.0211) #surface area from length(m)
+# surface area from length(m)
+A <- surface_area_from_length(l = 0.0211) 
 
-for(ind in 1:nrow(dat) ){
+for (ind in 1:nrow(dat)) {
 
-  out= try(Tb_Gates(A=A, D=0.0211/3, psa_dir=0.5, psa_ref=1-0.5, psa_air=1, psa_g=0.0, T_g=dat$SoilTemp[ind]+273, T_a=dat$Tgrass[ind]+273, Qabs=A*0.66*dat$Rad[ind], epsilon=0.95, H_L=dat$H_L[ind], ef=1.3, K=0.15), silent=TRUE)
-  if(is.numeric(out))TeGates[ind]=out
+  out <- Tb_Gates(A = A, D = 0.0211/3, psa_dir = 0.5, psa_ref = 1-0.5, psa_air = 1, psa_g = 0.0, T_g = dat$SoilTemp[ind] + 273, T_a = dat$Tgrass[ind] + 273, Qabs = A * 0.66 * dat$Rad[ind], epsilon = 0.95, H_L = dat$H_L[ind], ef = 1.3, K = 0.15)
+
+  if (is.numeric(out)) {
+    TeGates[ind] <- out
+  }
+
 }
 
 ```
@@ -203,40 +212,43 @@ We aggregate the data and plot average conditions across sites (Figure S2).
 The simplifying assumptions in the biophysical model implementation reduce alignment with the observed temperatures of grasshoppers, but the divergence of grasshopper temperatures from air temperatures at 2m and, to a lesser extent, air temperatures at grasshopper height demonstrate the importance of implementing biophysical models.
 
 ```{r, echo=FALSE, warning=FALSE}
-dat$TeGates=TeGates-273.15
+dat$TeGates <- TeGates - 273.15
 
-#drop NAs
-dat= dat[which(!is.na(dat$TeGates)),]
+# drop NAs
+dat <-  dat[which(!is.na(dat$TeGates)), ]
 
-#aggregate by hour
-dat.h= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour), FUN=mean, na.rm=TRUE))
-#aggregate by day and hour
-dat.dh= suppressWarnings(aggregate(dat, by=list(dat$Elev, dat$hour, dat$J), FUN=mean, na.rm=TRUE))
+# aggregate by hour
+dat.h <- suppressWarnings(aggregate(dat, by = list(dat$Elev, dat$hour), FUN = mean, na.rm = TRUE))
 
-#convert to long format
-dat.s= melt(dat.h, id = c("Elev", "J","hour","psi"))
+# aggregate by day and hour
+dat.dh <- suppressWarnings(aggregate(dat, by = list(dat$Elev, dat$hour, dat$J), FUN = mean, na.rm = TRUE))
 
-#plot
-dat.pl= subset(dat.s, dat.s$variable %in% c("Temp","SoilTemp","SanguinipesTemp","Te","Tgrass","TeGates") )
-dat.pl$variable= as.character(dat.pl$variable)
+# convert to long format
+dat.s <- melt(dat.h, id = c("Elev", "J", "hour", "psi"))
 
-#change names
-dat.pl[which(dat.pl$variable=="Temp"),"variable"]<-"Ta"
-dat.pl[which(dat.pl$variable=="SoilTemp"),"variable"]<-"Ts"
-dat.pl[which(dat.pl$variable=="SanguinipesTemp"),"variable"]<-"Te observed"
-dat.pl[which(dat.pl$variable=="Te"),"variable"]<-"Te"
-dat.pl[which(dat.pl$variable=="Tgrass"),"variable"]<-"Ta grasshopper height"
-dat.pl[which(dat.pl$variable=="TeGates"),"variable"]<-"Te Gates"
+# plot
+dat.pl <- subset(dat.s, dat.s$variable %in% c("Temp", "SoilTemp", "SanguinipesTemp", "Te", "Tgrass", "TeGates"))
+dat.pl$variable <- as.character(dat.pl$variable)
 
-#make factor
-dat.pl$variable= factor(dat.pl$variable, levels=c("Ta","Ts","Ta grasshopper height","Te","Te Gates","Te observed"))
-#make label
-dat.pl$elev.lab= paste(dat.pl$Elev,"m", sep=" ")
-#make Ta, Te classification
-dat.pl$Ttype="input"
-dat.pl$Ttype[which(dat.pl$variable %in% c("Te","Te Gates","Te observed") )]="estimates"
+# change names
+dat.pl[which(dat.pl$variable=="Temp"),"variable"] <- "Ta"
+dat.pl[which(dat.pl$variable=="SoilTemp"),"variable"] <- "Ts"
+dat.pl[which(dat.pl$variable=="SanguinipesTemp"),"variable"] <- "Te observed"
+dat.pl[which(dat.pl$variable=="Te"),"variable"] <- "Te"
+dat.pl[which(dat.pl$variable=="Tgrass"),"variable"] <- "Ta grasshopper height"
+dat.pl[which(dat.pl$variable=="TeGates"),"variable"] <- "Te Gates"
 
-ggplot(data=dat.pl, aes(x=hour, y = value, color=variable))+geom_line(aes(lty=variable) )+facet_wrap(~elev.lab)+theme_classic()+ theme(legend.position="bottom")+ylim(15,65)
+# make factor
+dat.pl$variable <- factor(dat.pl$variable, levels = c("Ta", "Ts", "Ta grasshopper height", "Te", "Te Gates", "Te observed"))
+
+# make label
+dat.pl$elev.lab <- paste(dat.pl$Elev, "m", sep = " ")
+
+# make Ta, Te classification
+dat.pl$Ttype <- "input"
+dat.pl$Ttype[which(dat.pl$variable %in% c("Te","Te Gates","Te observed") )] <- "estimates"
+
+ggplot(data = dat.pl, aes(x=hour, y = value, color = variable))+ geom_line(aes(lty = variable))+ facet_wrap( ~ elev.lab) + theme_classic()+ theme(legend.position = "bottom") + ylim(15, 65)
 
 ```
 
@@ -246,17 +258,19 @@ Body temperatures estimated by a grasshopper specific biophysical model (Te) are
 The general biophysical models that makes simplifying assumptions (Te Gates) tends to overestimate body temperatures.*
 
 ```{r, include=FALSE}
-#plot by date time
-dat.dh$Jhr= dat.dh$J +dat.dh$hour/24
+# plot by date time
+dat.dh$Jhr <- dat.dh$J +dat.dh$hour/24
 
-#convert to long format
-dat.s= melt(dat.dh, id = c("Elev", "J","hour","psi","Jhr"))
+# convert to long format
+dat.s <- melt(dat.dh, id = c("Elev", "J", "hour", "psi", "Jhr"))
 
-#plot
-dat.s= subset(dat.s, dat.s$variable %in% c("Temp","SoilTemp","SanguinipesTemp","Te","Tgrass") )
-#,"TeGates"
+# plot
 
-plot.t= ggplot(data=dat.s, aes(x=Jhr, y = value, color=variable))+geom_line(aes(lty=variable))+facet_grid(Elev~1)
+dat.s <- subset(dat.s, dat.s$variable %in% c("Temp", "SoilTemp", "SanguinipesTemp", "Te", "Tgrass") )
+
+# "TeGates"
+
+plot.t <- ggplot(data = dat.s, aes(x = Jhr, y = value, color=variable)) + geom_line(aes(lty = variable)) + facet_grid(Elev ~ 1)
 ```
 
 ```{r, include=FALSE}
