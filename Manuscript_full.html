@@ -13,7 +13,7 @@
 <meta name="author" content="Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis" />
 
 
-<title>TrenchR: an R package for transparent environmental and ecological biophysics</title>
+<title>TrenchR: an R package for transparent microclimate and biophysical ecology</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -386,7 +386,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">TrenchR: an R package for transparent
-environmental and ecological biophysics</h1>
+microclimate and biophysical ecology</h1>
 <h4 class="author">Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac
 Caruso, Aji John, Ofir Levy,</h4>
 <h4 class="author">Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi,
@@ -689,7 +689,7 @@ tau &lt;- 0.7 # Atmospheric transmissivity
 rho &lt;- 0.6 # Albedo
 Tb0 &lt;- 25  # Initial assumption of body temperature (C)
 
-doy   &lt;- day_of_year(&quot;2021-06-01&quot;, format = &quot;%Y-%m-%d&quot;) # Julian Date (DOY)
+doy   &lt;- day_of_year(&quot;2021-06-01&quot;, format = &quot;%Y-%m-%d&quot;) # Day of year
 
 snoon &lt;- solar_noon(lon = lon, doy = doy) # Estimate solar noon
 dayl  &lt;- daylength(lat = lat, doy = doy)  # Estimate day length
@@ -712,11 +712,11 @@ psi_rad &lt;- degrees_to_radians(psi_deg)
 
 Srad &lt;- sapply(psi_rad, FUN = solar_radiation, doy = doy, tau = tau, elev = elev, rho = rho)
 
-# Separate solar radiation into direct, diffuse, and reflected
+# Separate solar radiation into direct, diffuse, and reflected components
 
-Sdir &lt;- Srad[1,] # Direct solar radiation
-Sdif &lt;- Srad[2,] # Diffuse solar radiation
-Sref &lt;- Srad[3,] # Reflected solar radiation</code></pre>
+Sdir &lt;- Srad[1,] # Direct solar radiation (W/m2)
+Sdif &lt;- Srad[2,] # Diffuse solar radiation  (W/m2)
+Sref &lt;- Srad[3,] # Reflected solar radiation  (W/m2)</code></pre>
 <p>We then calculate hourly air and soil surface temperatures based on
 daily minimum and maximum temperatures. We select the sine-exponential
 model for air temperature and the sine model for surface
@@ -725,33 +725,25 @@ temperature:</p>
 
 Ta &lt;- sapply(1:24, diurnal_temp_variation_sineexp, T_max = Tmax, T_min = Tmin, t_r = tr, t_s = ts, alpha = 2.59, beta = 1.55, gamma = 2.2) 
 
-# Soil temperature (C)
+# Soil surface temperature (C)
 
 Ts &lt;- sapply(1:24, diurnal_temp_variation_sine, T_max = Tmax_s, T_min = Tmin_s) </code></pre>
 <p>At the second stage, we use microclimate models to scale air
-temperature and wind speed from weather station height (2 m) to lizard
-height (0.02 m). We assume a surface roughness of <span class="math inline">\(z_0 = 0.2\)</span> m, which corresponds to bare
-sand and determines the turbulence of airflow. We implement a neutral
-air temperature profile driven by density differences, an air
-temperature profile forced by wind speed, and a neutral wind speed
-profile.</p>
-<pre class="r"><code># Scale air temperature to lizard height
-# T_r = reference temperature
-# zr  = reference height
-# z0  = surface roughness
-# z   = organism height
-# T_s = surface temperature
+temperature (<span class="math inline">\(T_r\)</span>) and wind speed
+(<span class="math inline">\(u_r\)</span>) from weather station height
+(reference height <span class="math inline">\(z_r\)</span>= 2 m) to
+lizard height (organism height <span class="math inline">\(z\)</span>=
+0.02 m). We assume a surface roughness of <span class="math inline">\(z_0 = 0.2\)</span> m, which corresponds to bare
+sand and determines the turbulence of airflow. We implement neutral air
+temperature and wind speed profiles driven by density differences but
+profiles forced by wind speed are also available.</p>
+<pre class="r"><code># Neutral air temperature profile
 
-Ta_liz  &lt;- air_temp_profile_neutral(T_r = Ta, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts)  # Neutral air temperature profile
-Ta_liz2 &lt;- air_temp_profile(T_r = Ta, u_r = V, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts) # Air temperature profile forced by wind speed
+Ta_liz  &lt;- air_temp_profile_neutral(T_r = Ta, zr = 2, z0 = 0.2, z = 0.02, T_s = Ts) 
 
-# Scale wind speed to lizard height
-# u_r = reference wind speed
-# zr  = reference height
-# z0  = surface roughness
-# z   = organism height
+# Neutral wind speed profile
 
-V_liz &lt;- wind_speed_profile_neutral(u_r = V, zr = 2, z0 = 0.2 , z = 0.02) # Neutral wind speed profile</code></pre>
+V_liz &lt;- wind_speed_profile_neutral(u_r = V, zr = 2, z0 = 0.2 , z = 0.02) </code></pre>
 </div>
 <div id="energy-balance" class="section level3">
 <h3>Energy balance</h3>
@@ -768,7 +760,9 @@ conduction (W), <span class="math inline">\(Q_{met}\)</span> is the
 energy emitted due to metabolism (W), and <span class="math inline">\(Q_{evap}\)</span> is the energy emitted due to
 evaporative water loss (W). We will estimate each term on the right side
 of the equation in turn. Estimating <span class="math inline">\(Q_{abs}\)</span> requires the surface area exposed
-to radiation and the solar absorptivity of the animal surface (<span class="math inline">\(a\)</span> proportion). We model a 10 gram
+to radiation and the solar absorptivity of the animal surface (<span class="math inline">\(a\)</span> proportion). We use zenith angle <span class="math inline">\(psi\)</span> to estimate the projected
+(silhouette) area as a portion of the surface area of the organism,
+which allows estimating absorbed solar radiation. We model a 10 gram
 <em>Sceloporus</em> lizard with solar absorptivity <span class="math inline">\(a = 0.9\)</span> <span class="citation">(Gates,
 1980)</span>. We will initially assume <span class="math inline">\(T_b =
 T_a\)</span> to illustrate the calculations before solving for <span class="math inline">\(T_b\)</span> given the environmental
@@ -790,44 +784,40 @@ for (hour in 1:24) {
   Qabs[hour] &lt;- Qradiation_absorbed(a = a, A = A, psa_dir = psa[hour], psa_ref = 1 - psa[hour], S_dir = Sdir[hour], S_dif = Sdif[hour], a_s = rho)
 
 }</code></pre>
-<p>We estimate thermal radiation <span class="math inline">\(Q_{emit}\)</span> (W) for the lizard outdoors. We
-assume the surface emissivity of lizards, <span class="math inline">\(epsilon_s = 0.965\)</span> <span class="citation">(Barlett &amp; Gates, 1967)</span>.</p>
+<p>We estimate thermal radiation <span class="math inline">\(Q_{emit}\)</span> (W) for the lizard outdoors,
+where <span class="math inline">\(psa_{dir}\)</span> and <span class="math inline">\(psa_{ref}\)</span> are the proportions of surface
+area <span class="math inline">\(A\)</span> (<span class="math inline">\(m^2\)</span>) exposed to direct and reflected
+solar radiation, respectively. We assume the surface emissivity of
+lizards, <span class="math inline">\(epsilon_s = 0.965\)</span> <span class="citation">(Barlett &amp; Gates, 1967)</span>.</p>
 <pre class="r"><code>epsilon_s &lt;- 0.965 # Surface emissivity of lizards
 
 Qemit &lt;- rep(NA, 24)
 for (hour in 1:24) {
   
-  # psa_dir = proportions of surface area exposed to direct solar radiation
-  # psi_ref = proportions of surface area exposed to reflected solar radiation
-  # A       = surface area (m^2)
-
   Qemit[hour] &lt;- Qemitted_thermal_radiation(epsilon = epsilon_s, A = A, psa_dir = psa[hour], psa_ref = 1-psa[hour], T_b = Ta_liz[hour] + 273.15, T_g = Ts[hour] + 273.15, T_a = Ta_liz[hour] + 273.15, enclosed = FALSE)
   
 }</code></pre>
 <p>We next estimate convection <span class="math inline">\(Q_{conv}\)</span> (W) and conduction <span class="math inline">\(Q_{cond}\)</span> (W). We will estimate the
 lizard’s heat transfer coefficient, <span class="math inline">\(H_L\)</span> (<span class="math inline">\(Wm^{-2}K^{-1}\)</span>) using an empirical
 relationship for lizards (<code>heat_transfer_coefficient()</code>). We
-also illustrate a function estimating <span class="math inline">\(H_L\)</span> using a spherical approximation
+average thermal conductivity and kinematic viscosity across the day for
+simplicity and since there is not substantial diurnal variation. We also
+illustrate a function estimating <span class="math inline">\(H_L\)</span> using a spherical approximation
 (<code>heat_transfer_coefficient_approximation()</code>) and a
 simplified approximation
 (<code>heat_transfer_coefficient_simple()</code>) for cases when taxon
 specific relationships for estimating heat transfer coefficients are not
 available.</p>
-<pre class="r"><code>ap &lt;- airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
- 
-# Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
+<pre class="r"><code># Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
+
+ap &lt;- airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
 
 DRYAIRout &lt;- DRYAIR(db = Ta, bp = ap, alt = elev)
 
-K  &lt;- DRYAIRout$thcond # Thermal conductivity (Wm^-2K^-1) 
-nu &lt;- DRYAIRout$viskin # Kinematic viscosity (m2 s-1)
+K  &lt;- mean(DRYAIRout$thcond) # Thermal conductivity (Wm^-2K^-1) 
+nu &lt;- mean(DRYAIRout$viskin) # Kinematic viscosity (m2 s-1)
 
 svl &lt;- 0.006 # Approximate snout vent length (meters) for Sceloporus, used as the characteristic dimension for heat transfer
-
-# We will use the average of K and nu across the day for simplicity and since there is not a substantial diurnal variation.
-
-K  &lt;- mean(K)  # Average thermal conductivity across the day
-nu &lt;- mean(nu) # Average kinematic viscosity
 
 # Estimate the heat transfer coefficient using an empirical relationship for lizards
 
@@ -849,7 +839,7 @@ multiplier can be incorporated to account for increases in heat exchange
 resulting from air turbulence in field conditions. We implement the
 function in R assuming that 2/3 of the lizard’s surface area is
 exchanging heat through convection. We currently estimate no convection
-since we are assuming <span class="math inline">\(Tb = Ta\)</span> for
+since we are assuming <span class="math inline">\(T_b = T_a\)</span> for
 illustration purposes:</p>
 <pre class="r"><code>Qconv &lt;- rep(NA, 24)
 for (hour in 1:24) {
@@ -897,12 +887,13 @@ for (hr in 1:24) {
   
 }</code></pre>
 <p>We additionally estimate <span class="math inline">\(T_b\)</span>
-using a specialized function for lizards <span class="citation">(Buckley, 2008)</span>:</p>
+using a specialized function for lizards <span class="citation">(Buckley, 2008)</span>, where <span class="math inline">\(F_d\)</span>, <span class="math inline">\(F_r\)</span>, <span class="math inline">\(F_a\)</span>, and <span class="math inline">\(F_g\)</span> are the view factors between the
+surface of the lizard and diffuse solar radiation, reflected solar
+radiation, atmospheric thermal radiation, and ground thermal radiation,
+respectively:</p>
 <pre class="r"><code>Te3 &lt;- rep(NA, 24)
 for (hour in 1:24) {
   
-  # F_d, F_r, F_a, and F_g are the view factors between the surface of the lizard and diffuse solar radiation, reflected solar radiation, and atmospheric thermal radiation, and ground thermal radiation, respectively. 
-
   Te3[hour] &lt;- Tb_lizard(T_a = Ta_liz[hour], T_g = Ts[hour], u = V_liz, svl = svl * 1000, m = mass, psi = psi_deg[hour], rho_S = rho, elev = elev, doy = doy, sun = TRUE, surface = TRUE, alpha_S = a, alpha_L = 0.965, epsilon_s = epsilon_s, F_d = 0.8, F_r = 0.5, F_a = 0.5, F_g = 0.5)
 
 }</code></pre>
@@ -962,15 +953,16 @@ tutorials.</p>
 <div id="authors-contributions" class="section level2">
 <h2>Authors’ Contributions</h2>
 <p>LB conceived and designed the package and lead all aspect of the
-packages creation and dissemination; BBO, IC, AJ, OL, AM, ER, YS, and JS
-wrote and edited functions and associated package resources; AJ and JS
-configured the package; AM, BBO, YS, and LB converted and edited the
-educational modules. All authors contributed critically to the drafts
-and gave final approval for publication.</p>
+packages creation and dissemination. All authors wrote and edited
+functions and associated package resources, contributed critically to
+manuscript drafts, and gave final approval for publication. AJ and JS
+configured the package. AM, BBO, YS, and LB converted and edited the
+educational modules.</p>
 </div>
 <div id="data-availability" class="section level2">
 <h2>Data Availability</h2>
-<p>All code and data are available at <a href="https://github.com/trenchproject/TrenchR" class="uri">https://github.com/trenchproject/TrenchR</a>.</p>
+<p>TrenchR is available at <a href="https://github.com/trenchproject/TrenchR" class="uri">https://github.com/trenchproject/TrenchR</a>. All text,
+code, and data for this manuscript are available at <a href="https://github.com/trenchproject/TrenchRmanuscript/" class="uri">https://github.com/trenchproject/TrenchRmanuscript/</a>.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
