@@ -1,9 +1,9 @@
 ---
-title: "Appendix S1"
+title: "Appendix S2"
 author: "Buckley et al."
 output:
-  word_document: default
   html_document: default
+  word_document: default
   pdf_document: 
     pandoc_args: --listings
     includes:
@@ -53,7 +53,7 @@ We start by using wind speeds ($u_r$, m/s) at a vector of reference heights ($z_
 z0 <- apply(C1.hr[, c("Wind0.25m", "Wind0.5m", "Wind1m", "Wind1.5m")], FUN = surface_roughness, MARGIN = 1, zr = c(0.25, 0.5, 1.0, 1.5))
 ```
 
-We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR that assume both neutral and forced flows and treat the profile as a single or multiple segments. The functions require temperatures ($T_r$, $^\circ$C) and wind speeds ($U_r$, $m s^{-1}$) at reference heights ($z_r$, $m$), $z_0$, surface temperature ($T_s$, $^\circ$C), and the desired height for scaling ($z$, m).
+We then calculate the temperature and wind speed profiles for a given hour using multiple, alternative functions in TrenchR that assume both neutral and forced flows and treat the profile as a single or multiple segments. The functions require temperatures ($T_r$, $^\circ$C) and wind speeds ($u_r$, $m s^{-1}$) at reference heights ($z_r$, $m$), $z_0$, surface temperature ($T_s$, $^\circ$C), and the desired height for scaling ($z$, m).
 
 ```{r}
 # subset to day and hour
@@ -126,7 +126,7 @@ dat$lon <- sites$Lon[match1]
 dat$lat <- sites$Lat[match1]
 
 # Subset to August
-dat.dt<- strptime(dat$datetime, format = "%m/%d/%Y %H:%M", tz = "MST") # as.Date
+dat.dt<- strptime(dat$datetime, format = "%m/%d/%Y %H:%M", tz = "MST") 
 dataug <- subset(dat, dat.dt$mon == 7)
 
 # subset to day
@@ -164,7 +164,7 @@ We then use biophysical models to estimate body temperatures ($T_b$, $^\circ$C) 
 
 ```{r, warning=FALSE}
 
-dat$Te <- Tb_grasshopper(T_a = dat$Tgrass, T_g = dat$SoilTemp, u = dat$Ugrass, H = dat$Rad, K_t = 1, psi = dat$psi, l = 0.0211, Acondfact = 0.0, abs = 0.9, r_g = 0.5) 
+dat$Te <- Tb_grasshopper(T_a = dat$Tgrass, T_g = dat$SoilTemp, u = dat$Ugrass, S = dat$Rad, K_t = 1, psi = dat$psi, l = 0.0211, Acondfact = 0.0, abs = 0.9, r_g = 0.5) 
 
 ```
 
@@ -180,11 +180,11 @@ We then implement a generic energy budget.
 We first illustrate the estimation of convective heat transfer coefficients ($H_L$, $W K^{-1} m^{-2}$) as a function of wind speed ($V$, $m s^{-1}$) based on empirical measurements, where $D$ is the characteristic dimension (m), $K$ is the thermal conductivity of air ($W m^{-1} K^{-1}$), and $nu$ is the kinematic viscosity of air ($m^2 s^{-1}$). We subsequently estimate $H_L$ using a spherical approximation and a simplified version of the approximation, respectively.
 
 ```{r}
-dat$H_L <- heat_transfer_coefficient(V = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6) , taxon = "cylinder")
+dat$H_L <- heat_transfer_coefficient(u = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6) , taxon = "cylinder")
 
-H_L1 <- heat_transfer_coefficient_approximation(V = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6), taxon = "flyinginsect")
+H_L1 <- heat_transfer_coefficient_approximation(u = dat$Ugrass, D = 0.0211, K = 0.025, nu = 15.3 * 10^(-6), taxon = "flyinginsect")
 
-H_L2 <- heat_transfer_coefficient_simple(V = dat$Ugrass, D = 0.0211, type = "Gates")
+H_L2 <- heat_transfer_coefficient_simple(u = dat$Ugrass, D = 0.0211, type = "Gates")
 
 ```
 
@@ -198,7 +198,7 @@ A <- surface_area_from_length(l = 0.0211)
 
 for (ind in 1:nrow(dat)) {
 
-  out <- Tb_Gates(A = A, D = 0.0211/3, psa_dir = 0.5, psa_ref = 1-0.5, psa_air = 1, psa_g = 0.0, T_g = dat$SoilTemp[ind] + 273, T_a = dat$Tgrass[ind] + 273, Qabs = A * 0.66 * dat$Rad[ind], epsilon = 0.95, H_L = dat$H_L[ind], ef = 1.3, K = 0.15)
+  out <- Tb_Gates(A = A, D = 0.0211/3, psa_dir = 0.5, psa_ref = 1-0.5, psa_air = 1, psa_g = 0.0, T_g = dat$SoilTemp[ind], T_a = dat$Tgrass[ind], Qabs = A * 0.66 * dat$Rad[ind], epsilon = 0.95, H_L = dat$H_L[ind], ef = 1.3, K = 0.15)
 
   if (is.numeric(out)) {
     TeGates[ind] <- out
@@ -212,8 +212,6 @@ We aggregate the data and plot average conditions across sites (Figure S2).
 The simplifying assumptions in the biophysical model implementation reduce alignment with the observed temperatures of grasshoppers, but the divergence of grasshopper temperatures from air temperatures at 2m and, to a lesser extent, air temperatures at grasshopper height demonstrate the importance of implementing biophysical models.
 
 ```{r, echo=FALSE, warning=FALSE}
-dat$TeGates <- TeGates - 273.15
-
 # drop NAs
 dat <-  dat[which(!is.na(dat$TeGates)), ]
 
