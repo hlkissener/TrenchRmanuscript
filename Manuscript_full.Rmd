@@ -4,8 +4,8 @@ author:
   - "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy,"
   - "Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
 output:
-  html_document: default
   word_document: default
+  html_document: default
   pdf_document: 
     pandoc_args: --listings
     includes:
@@ -85,7 +85,7 @@ Our package was built using the devtools methodology (<https://github.com/r-lib/
 Issues and feature requests can be contributed in Github (<https://github.com/trenchproject/TrenchR>). 
 The package is available via CRAN and Github. 
 
-Few of the functions in TrenchR are "state of the art". The development of increasingly complex microclimate and biophysical models before open and reproducible science was emphasized or feasible has limited their uptake. Yet, such models are crucial to improving understand and prediction of species responses to climate change. We contend there is a need for simple and modular functions that can be combined and extended in a null modeling approach until the model adequately describes organismal interactions with their environment while remaining accessible and transparent. 
+The development of increasingly complex microclimate and biophysical models before open and reproducible science was emphasized or feasible has limited their uptake. Yet, such models are crucial to improving understand and prediction of species responses to climate change. We contend there is a need for simple and modular functions that can be combined and extended in a null modeling approach until the model adequately describes organismal interactions with their environment while remaining accessible and transparent. 
 
 Validation against sensor data including from physical models of organisms is essential to microclimate and biophysical modelling. We adapted well established functions from biophysical ecology textbooks [@campbell2000introduction; @gates1980biophysical] and research articles. Source references are included in function headers and reference sections. Many of the references, particularly those developing taxa-specific biophysical models, contain extensive empirical validation. Appendix S2 illustrates validation of biophysical models using a physical model of a grasshopper. Appendix S1 compares TrenchR function to NicheMapR functions. We have incorporated default parameters (e.g., organism emissivity or heat conduction rates) when general values are available. Many functions additionally include comments that describe potential parameterizations.
 The biophysical ecology texts [@campbell2000introduction; @gates1980biophysical] include many tables with parameter values and we provide several data tables describing solar and thermal absorptivity in TrenchR.
@@ -109,7 +109,7 @@ The functions allow implementing an energy balance including the following compo
   - *radiative heat exchanges* of solar and thermal radiation; 
   - *convective heat exchanges* between organisms and their surrounding fluid (air or water) driven by fluid flow; 
   - *conductive heat exchanges* between organisms and solid surfaces (generally the ground) due to physical contact; and 
-  - *evaporative heat exchanges* associated with organisms' evaporative water loss.  
+  - *evaporative and metabolic heat exchanges* associated with organisms' evaporative water loss and metabolic heat generation.  
 
 Additional functions aggregate these forms of heat exchange into energy balances and to use the energy balances to predict body temperatures.
 
@@ -256,7 +256,7 @@ where $Q_{net}$ is the net energy exchange with the environment (W), $Q_{abs}$ i
 We will estimate each term on the right side of the equation in turn. 
 Estimating $Q_{abs}$ requires the surface area exposed to radiation and the solar absorptivity of the animal surface ($a$ proportion). We use zenith angle $psi$ to estimate the projected (silhouette) area as a portion of the surface area of the organism, which allows estimating absorbed solar radiation.
 We model a 10 gram *Sceloporus* lizard with solar absorptivity $a = 0.9$ [@gates1980biophysical]. 
-We will initially assume $T_b = T_a$ to illustrate the calculations before solving for $T_b$ given the environmental conditions.
+We will initially assume $T_b = T_a + 10$ to illustrate the calculations before solving for $T_b$ given the environmental conditions.
 
 ```{r}
 mass <- 10  # Mass (g)
@@ -300,10 +300,12 @@ for (hour in 1:24) {
 ```
 
 We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$ (W). 
-We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`). We average thermal conductivity and kinematic viscosity across the day for simplicity and since there is not substantial diurnal variation. We also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available. We estimate the characteristic dimension, which determines exposure to convective heat exchange as the the cube root of volume, assuming the animal density approximates that of water [@mitchell1976heat]. These coefficients assume convection is forced by the wind. TrenchR includes approaches for free convection and a function (`free_or_forced_convection()`) that can be used to decide whether free or forced convection is appropriate. The function uses dimensionless numbers, which have been developed to describe heat transfer coefficients associated with convection over different geometries and can be estimated using TrenchR (e.g., Grashof, Nusselt, and Reynolds numbers).
+We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`). We average thermal conductivity and kinematic viscosity across the day for simplicity and since there is not substantial diurnal variation. We also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available. We estimate the characteristic dimension, which determines exposure to convective heat exchange as the cube root of volume, assuming the animal density approximates that of water [@mitchell1976heat]. 
+
+These coefficients assume convection is forced by the wind. TrenchR includes approaches for free convection and a function (`free_or_forced_convection()`) that can be used to decide whether free or forced convection is appropriate. The function uses dimensionless numbers, which have been developed to describe heat transfer coefficients associated with convection over different geometries and can be estimated using TrenchR (e.g., Grashof, Nusselt, and Reynolds numbers).
 
 ```{r}
-# Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity
+# Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity. 
 
 ap <- airpressure_from_elev(elev) * 1000 # Barometric pressure (pascal)
 
@@ -335,28 +337,26 @@ $$Q_{conv} = ef \cdot H_L(A\cdot \mbox{proportion})(T_a-T_b),$$
 
 where an enhancement factor, $ef$, multiplier can be incorporated to account for increases in heat exchange resulting from air turbulence in field conditions. 
 We implement the function in R assuming that 2/3 of the lizard's surface area is exchanging heat through convection. 
-We currently estimate no convection since we are assuming $T_b = T_a$ for illustration purposes:
 
 ```{r}
 Qconv <- rep(NA, 24)
 for (hour in 1:24) {
   
-  Qconv[hour] <- Qconvection(T_a = Ta_liz[hour] + 273.15, T_b = Ta_liz[hour] + 273.15, H = H_L, A = A, proportion = 0.67, ef = 1.3)
+  Qconv[hour] <- Qconvection(T_a = Ta_liz[hour] + 273.15, T_b = Ta_liz[hour] + 10 + 273.15, H = H_L, A = A, proportion = 0.67, ef = 1.3)
   
 }
 ```
 
 We estimate conductive heat flow (W) from the lizard to the surface assuming conductance through the animal tissue is the rate limiting step as follows:
 
-$$Q_{cond} = A \cdot \mbox{proportion} \cdot K(T_g-T_b)/d. $$ 
-
-We implement the estimate assuming that conductive heat exchange occurs down to a soil depth of 2.5cm. We use this value rather than skin thickness, which results in rapid conduction and does not readily reach steady state conditions.
+$$Q_{cond} = A \cdot \mbox{proportion} \cdot K_{skin}(T_g-T_b)/d$$ 
+where $K_{skin}$ in the thermal conductivity of lizard skin ($Wm^-2K^-1$). We implement the estimate assuming that conductive heat exchange occurs down to a soil depth of 2.5cm. We use this value rather than skin thickness, which results in rapid conduction and does not readily reach steady state conditions.
 
 ```{r}
 Qcond <- rep(NA, 24)
 for(hr in 1:24) {
   
-  Qcond[hr] <- Qconduction_animal(T_g = Ts[hr] + 273.15, T_b = Ta_liz[hr] + 273.15, d = 0.025, K = K, A = A, proportion = psa_g)
+  Qcond[hr] <- Qconduction_animal(T_g = Ts[hr] + 273.15, T_b = Ta_liz[hr] + 10 + 273.15, d = 0.025, K = 0.5, A = A, proportion = psa_g)
   
 }
 ```
@@ -460,9 +460,7 @@ We thank A. Cannistra, R. Huey, J. Kingsolver, L. Miller, W. Porter, and H. A. W
 We particularly thank M. Kearney for extensive input on TrenchR and its alignment with NicheMapR and for contributing two educational modules and code for comparing TrenchR to NicheMapR.
 
 ## Authors' Contributions
-
-LB conceived and designed the package and lead all aspect of the packages creation and dissemination. All authors wrote and edited functions and associated package resources, contributed critically to manuscript drafts, and gave final approval for publication. AJ and JS configured the package. AM, BBO, YS, and LB converted and edited the educational modules. 
-Add? Conceptualization, Project Administration, Software, Writing – Original Draft Preparation, Writing – Review & Editing
+Lauren Buckley: Conceptualization, Methodology, Project Administration, Writing – Original Draft Preparation. All authors: Software, Writing – Review & Editing. 
 
 ## Data Availability
 TrenchR is available at CRAN and <https://github.com/trenchproject/TrenchR>. All text, code, and data for this manuscript are available at <https://github.com/trenchproject/TrenchRmanuscript/>.

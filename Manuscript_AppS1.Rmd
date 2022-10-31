@@ -2,8 +2,8 @@
 title: "Appendix S1"
 author: "Buckley et al."
 output:
-  html_document: default
   word_document: default
+  html_document: default
   pdf_document: 
     pandoc_args: --listings
     includes:
@@ -41,7 +41,7 @@ Tb0 <- 25  # Initial assumption of body temperature (C)
 doy <- day_of_year("2021-06-15", format = "%Y-%m-%d") # Day of year, changed to mid June to correspond to micro_global data
 z <- 0.02 # height of animal
 psa_g <- 0.33 # fraction of animal surface contacting the ground
-K_sub <- 0.5 # parameter for thermal conductivity of substrate, W/mC
+K_skin <- 0.5 # parameter for thermal conductivity of skin, W/mC
 ```
 
 We then run the NicheMapR microclimate model for clear sky conditions at this site, passing elevation (would otherwise have been 2257m), soil albedo and animal height used in the example. The microclimate model output is prepared as model input.
@@ -290,13 +290,13 @@ legend("topleft",
        lty = NULL, pch = c(1,3), col = c("black","red"))
 ```
 
-We then Estimate and compare conduction.
+We then estimate and compare conduction.
 ```{r}
 Qcond <- rep(NA, 24)
 Qcond_NMR <- Qcond
 
 for(hr in 1:24) {
-  Qcond[hr] <- Qconduction_animal(T_g = Ts[hr] + 273.15, T_b = Ta_liz[hr] + 273.15, d = 0.025, K = K_sub, A = A, proportion = psa_g)
+  Qcond[hr] <- Qconduction_animal(T_g = Ts[hr] + 273.15, T_b = Ta_liz[hr] + 273.15, d = 0.025, K = K_skin, A = A, proportion = psa_g)
   
   # use COND_ecto for NMR prediction
   Qcond_NMR[hr] <- COND_ecto(AV = GEOM.out$AV, TSKIN = Ta_liz[hr], TSUBST = Ts[hr], SUBTK = K_sub)
