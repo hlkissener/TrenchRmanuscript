@@ -85,7 +85,7 @@ Our package was built using the devtools methodology (<https://github.com/r-lib/
 Issues and feature requests can be contributed in Github (<https://github.com/trenchproject/TrenchR>). 
 The package is available via CRAN and Github. 
 
-Validation against sensor data including from physical models of organisms is essential to microclimate and biophysical modelling. We adapted well established and validated functions from biophysical ecology textbooks [@campbell2000introduction; @gates1980biophysical] and research articles. Source references are cited in function headers and reference sections. Many of the references, particularly those developing taxa-specific biophysical models, contain extensive empirical validation. Appendix S2 illustrates validation of biophysical models using a physical model of a grasshopper. Appendix S1 compares TrenchR function to NicheMapR functions. We have incorporated default parameters (e.g., organism emissivity or heat conduction rates) when general values are available. Many functions additionally include comments that describe potential parameterizations.
+Validation against sensor data including from physical models of organisms is essential to microclimate and biophysical modelling. We adapted well established and validated functions from biophysical ecology textbooks [@campbell2000introduction; @gates1980biophysical] and research articles. Source references are cited in function headers and reference sections. Many of the references, particularly those developing taxa-specific biophysical models, contain extensive empirical validation. Appendix S2 illustrates validation of biophysical models using a physical model of a grasshopper. Appendix S1 compares TrenchR functions to NicheMapR functions. We have incorporated default parameters (e.g., organism emissivity or heat conduction rates) when general values are available. Many functions additionally include comments that describe potential parameterizations.
 The biophysical ecology texts [@campbell2000introduction; @gates1980biophysical] include many tables with parameter values and we provide several data tables describing solar and thermal absorptivity in TrenchR.
 
 ### Components
@@ -195,7 +195,7 @@ tr    <- snoon - dayl / 2 # Time of sunrise
 ts    <- snoon + dayl / 2 # Time of sunset
 ```
 
-Although measured solar radiation is preferable if available, we can estimate hourly solar radiation by discounting incoming solar radiation as it moves through the atmosphere as follows. We use the approach from Cambpell and Norman [-@campbell2000introduction], which uses an empirical relation to partition radiation into direct, diffuse, and reflected components. The `partition_solar_radiation()` function includes 8 empirical relationships for and the proportion_diffuse_solar_radiation() includes a more complex numerical approximation  for partitioning radiation components as described in the *Estimating microclimates* vignette.
+Although measured solar radiation is preferable if available, we can estimate hourly solar radiation by discounting incoming solar radiation as it moves through the atmosphere as follows. We use the approach from Cambpell and Norman [-@campbell2000introduction], which uses an empirical relation to partition radiation into direct, diffuse, and reflected components. The `partition_solar_radiation()` function includes 8 empirical relationships for, and the proportion_diffuse_solar_radiation() includes a more complex numerical approximation for, partitioning radiation components as described in the *Estimating microclimates* vignette.
 
 ```{r}
 # Estimate zenith angle (degrees)
@@ -359,7 +359,7 @@ for(hr in 1:24) {
 }
 ```
 
-We assume, as is generally done for lizards, that heat exchange associated with metabolism and evaporation is negligible. however, functions for estimating both forms of heat exchange available in TrenchR.
+We assume, as is generally done for lizards, that heat exchange associated with metabolism and evaporation is negligible. However, functions for estimating both forms of heat exchange available in TrenchR.
 
 ```{r}
 Qmet  <- 0 
@@ -429,7 +429,7 @@ par(new = TRUE)
 plot(1:24, Sdir, pch = 16, axes = FALSE, xlab = NA, ylab = NA, type = "l", col = "#FDE725FF")
 axis(side = 4, las = 1)
 mtext(side = 4, line = 3, 'Radiation (W/m^2)')
-legend("topleft",
+legend("topleft", bty = "n",
        legend = c("Ta (2m)", "Ta (0.02m)", "Ts", "Te", "Radiation"),
        lty = 1, pch = NA, col = c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF"))
 ```
