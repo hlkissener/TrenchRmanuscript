@@ -1,5 +1,5 @@
 ---
-title: 'TrenchR: an R package for modular and accessbile microclimate and biophysical ecology'
+title: 'TrenchR: an R package for modular and accessible microclimate and biophysical ecology'
 author: 
   - "Lauren B. Buckley, Bryan A. Briones Ortiz, Isaac Caruso, Aji John, Ofir Levy,"
   - "Abigail V. Meyer, Eric A. Riddell, Yutaro Sakairi, and Juniper Simonis"
@@ -39,7 +39,7 @@ Type: new methods
 
 ## Abstract
 
-Much understanding of organismal responses to climate change and variability relies on the assumption that body temperatures are equal to temporally averaged air temperatures high above the ground. However, most organisms live near the ground and acute exposure to solar and thermal radiation and thermal extremes can substantially elevate or depress their body temperatures. We introduce the TrenchR package, which aids in Translating Environmental Change into organismal responses. The package includes microclimate models to vertically scale weather station data to organismal heights. The biophysical modeling tools include both general models for heat flows and specific models to predict body temperatures for a variety of ectothermic taxa. Additional functions model and temporally partition air and soil temperatures and solar radiation. We offer utility functions to aid in estimating the organismal and environmental parameters needed for biophysical ecology. TrenchR focuses on simple and modular functions so users can create transparent and flexible models for biophysical applications. The package aims to introduce and enable microclimate and biophysical modeling to improve ecological and evolutionary forecasting. We further this aim through a series of educational modules that introduce the field of biophysical ecology.
+Much understanding of organismal responses to climate change and variability relies on the assumption that body temperatures are equal to temporally averaged air temperatures high above the ground. However, most organisms experience microclimates near the ground and acute exposure to solar and thermal radiation and thermal extremes can substantially elevate or depress their body temperatures. We introduce the TrenchR package, which aids in Translating Environmental Change into organismal responses. The package includes microclimate models to vertically scale weather station data to organismal heights. Additional functions model and temporally partition air and soil temperatures and solar radiation. TrenchR biophysical modeling tools include both general models for heat flows and specific models to predict body temperatures for a variety of ectothermic taxa. We also offer utility functions to aid in estimating the organismal and environmental parameters needed for biophysical ecology. TrenchR focuses on simple and modular functions so users can create transparent and flexible models for biophysical applications. The package aims to introduce and enable microclimate and biophysical modeling to improve ecological and evolutionary forecasting. We further this aim through a series of educational modules that introduce the field of biophysical ecology.
 
 **Keywords**: biophysical, climate change, ecotherm, energy budget,
 mechanistic models, microclimate, scaling, temperature
@@ -49,7 +49,8 @@ mechanistic models, microclimate, scaling, temperature
 Responses of organisms and ecosystems to climate change are heterogeneous and thus inconsistent with current predictive models [@maguire2015modeling]. 
 Some of these predictive shortcomings stem from omitting spatial and temporal environmental variation and how it interacts with organismal phenotypes (e.g., size, coloration) [@nadeau2017coarse; @potter2013microclimatic]. 
 Many analyses assume that organismal body temperatures are equal to air temperatures at weather station height (usually 2 meters). 
-However, air temperatures near the ground where most organisms reside are often considerably warmer, and absorption of solar and thermal radiation can raise body temperatures well above air temperatures, resulting in potential discrepancies of tens of degrees Celsius [@sinclair2016; @sunday2014; @kearney2009].
+However, air temperatures near the ground where most organisms reside are often considerably warmer, and absorption of solar and thermal radiation can raise body temperatures well above air temperatures, resulting in potential discrepancies of tens of degrees Celsius [@sinclair2016; @sunday2014; @kearney2009]. The rapid drop in performance and onset of thermal stress at high body temperatures can amplify the biological significance of underestimations [@buckley2022asymmetry].
+
 Applications are increasingly demonstrating the importance of accounting for microclimate variation [@bramer2018advances; @butikofer2020problem; @lembrechts2019comparing]. 
 Acute thermal stress events are often more relevant to the physiology and energy balance of organisms than daily, monthly, or annually averaged environmental conditions. 
 Yet, daily and seasonal environmental variation is often neglected [@dillon2016introduction; @dillon2016life]. 
@@ -60,8 +61,7 @@ In recent decades, adoption of biophysical approaches is expanding with recognit
 
 Estimating how organisms experience their thermal environment generally entails two classes of models [@gates1980biophysical; @campbell2000introduction] (Figure 1).
 Microclimate models allow scaling conditions from sensors to organism height. They can characterize heat and air transport to estimate vertical air and soil temperature and wind profiles. 
-They can also characterize direct and diffuse solar radiation and longwave radiation emanating from the sky, ground, and surrounding objects like vegetation. 
-Biophysical models estimate body temperatures using an energy budget to balance heat exchanges between organisms and their environment.
+They can also characterize direct and diffuse solar radiation and longwave radiation emanating from the sky, ground, and surrounding objects like vegetation. Microclimate model output is used as input in biophysical models, which estimate body temperatures using an energy budget to balance heat exchanges between organisms and their environment.
 
 ```{r, echo=FALSE, fig.height=4, fig.align = 'center', out.width = "75%"}
 knitr::include_graphics('./figures/TrenchRBiophys.png')
@@ -71,11 +71,11 @@ knitr::include_graphics('./figures/TrenchRBiophys.png')
 B) Biophysical models balance heat exchanges between organisms and their environment to estimate body temperatures [@porter1973behavioral]. 
 A thermal image depicts how grasshopper body temperatures vary substantially from vegetation, air, and ground temperatures due to heat exchange.
 
-The TrenchR package is intended to complement the NicheMapR package, which includes sophisticated microclimate [@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Although the Fortran source code was recently released, the complexity of NicheMapR functions can make it difficult to understand and modify the source code. The integrated functions made it difficult to separate and adapt different forms of heat flow, but we note that some modular R functions were made available during the review process for this manuscript that enable comparison with the TrenchR package (Appendix S1). Many of the approaches are similar between the packages, but TrenchR provides simple functions to aid the understanding and accessibility of biophysical approaches.  The TrenchR functions are modular and easily adapt to a variety of organisms and research questions. 
-Although many of the TrenchR functions are general, some components of TrenchR are best suited for ectothermic animals. 
-We omit plant specific biophysical models since they are the focus of several R packages [tealeaves: [@muir2019tea]; plantecophys: [@duursma2015plantecophys]]. 
+The TrenchR package is intended to complement the NicheMapR package, which includes sophisticated microclimate [@kearney2017nichemapr] and biophysical [@kearney2020nichemapr] models. Although the Fortran source code was recently released, the complexity of NicheMapR functions can make it difficult to understand and modify the source code and Fortran can be complicated to compile and run. The integrated functions made it difficult to separate and adapt different forms of heat flow, but we note that some modular R functions were made available during the review process for this manuscript that enable comparison with the TrenchR package (Appendix S1). Many of the approaches are similar between the packages, but TrenchR provides simple R functions to aid the understanding and accessibility of biophysical approaches.  The TrenchR functions are modular and easily adapt to a variety of organisms and research questions. Although many of the TrenchR functions are general, some components of TrenchR are best suited for ectothermic animals. We omit plant specific biophysical models since they are the focus of several R packages [tealeaves: [@muir2019tea]; plantecophys: [@duursma2015plantecophys]]. 
 Some energy budget calculation components of biophysical models are also available in the ThermImage package [@tattersall2017]. 
 Microclimate models, with an emphasis on describing spatial variation, are also available in the microclima package [@maclean2019microclima].
+
+The development of increasingly complex microclimate and biophysical models before open and reproducible science was emphasized or feasible has limited their uptake. Yet, such models are crucial to improving understand and prediction of species responses to climate change. Simple and modular functions can be combined and extended in a null modeling approach until the model adequately describes organismal interactions with their environment while remaining accessible and transparent.
 
 ## Methods and Features
 
@@ -85,9 +85,7 @@ Our package was built using the devtools methodology (<https://github.com/r-lib/
 Issues and feature requests can be contributed in Github (<https://github.com/trenchproject/TrenchR>). 
 The package is available via CRAN and Github. 
 
-The development of increasingly complex microclimate and biophysical models before open and reproducible science was emphasized or feasible has limited their uptake. Yet, such models are crucial to improving understand and prediction of species responses to climate change. We contend there is a need for simple and modular functions that can be combined and extended in a null modeling approach until the model adequately describes organismal interactions with their environment while remaining accessible and transparent. 
-
-Validation against sensor data including from physical models of organisms is essential to microclimate and biophysical modelling. We adapted well established functions from biophysical ecology textbooks [@campbell2000introduction; @gates1980biophysical] and research articles. Source references are included in function headers and reference sections. Many of the references, particularly those developing taxa-specific biophysical models, contain extensive empirical validation. Appendix S2 illustrates validation of biophysical models using a physical model of a grasshopper. Appendix S1 compares TrenchR function to NicheMapR functions. We have incorporated default parameters (e.g., organism emissivity or heat conduction rates) when general values are available. Many functions additionally include comments that describe potential parameterizations.
+Validation against sensor data including from physical models of organisms is essential to microclimate and biophysical modelling. We adapted well established and validated functions from biophysical ecology textbooks [@campbell2000introduction; @gates1980biophysical] and research articles. Source references are cited in function headers and reference sections. Many of the references, particularly those developing taxa-specific biophysical models, contain extensive empirical validation. Appendix S2 illustrates validation of biophysical models using a physical model of a grasshopper. Appendix S1 compares TrenchR function to NicheMapR functions. We have incorporated default parameters (e.g., organism emissivity or heat conduction rates) when general values are available. Many functions additionally include comments that describe potential parameterizations.
 The biophysical ecology texts [@campbell2000introduction; @gates1980biophysical] include many tables with parameter values and we provide several data tables describing solar and thermal absorptivity in TrenchR.
 
 ### Components
@@ -302,7 +300,7 @@ for (hour in 1:24) {
 We next estimate convection $Q_{conv}$ (W) and conduction $Q_{cond}$ (W). 
 We will estimate the lizard's heat transfer coefficient, $H_L$ ($Wm^{-2}K^{-1}$) using an empirical relationship for lizards (`heat_transfer_coefficient()`). We average thermal conductivity and kinematic viscosity across the day for simplicity and since there is not substantial diurnal variation. We also illustrate a function estimating $H_L$ using a spherical approximation (`heat_transfer_coefficient_approximation()`) and a simplified approximation (`heat_transfer_coefficient_simple()`) for cases when taxon specific relationships for estimating heat transfer coefficients are not available. We estimate the characteristic dimension, which determines exposure to convective heat exchange as the cube root of volume, assuming the animal density approximates that of water [@mitchell1976heat]. 
 
-These coefficients assume convection is forced by the wind. TrenchR includes approaches for free convection and a function (`free_or_forced_convection()`) that can be used to decide whether free or forced convection is appropriate. The function uses dimensionless numbers, which have been developed to describe heat transfer coefficients associated with convection over different geometries and can be estimated using TrenchR (e.g., Grashof, Nusselt, and Reynolds numbers).
+These coefficients assume convection is forced by the wind. TrenchR includes approaches for free convection and a function (`free_or_forced_convection()`) that evaluates whether free or forced convection is appropriate. The function uses dimensionless numbers, which have been developed to describe heat transfer coefficients associated with convection over different geometries and can be estimated using TrenchR (e.g., Grashof, Nusselt, and Reynolds numbers).
 
 ```{r}
 # Use DRYAIR from NicheMapR to estimate the thermal conductivity of air and kinematic viscosity. 
@@ -374,9 +372,7 @@ The full heat budget can be calculated as follows [@gates1980biophysical]:
 Qnet <- Qnet_Gates(Qabs = Qabs, Qemit = Qemit, Qconv = Qconv, Qcond = Qcond, Qmet = Qmet, Qevap = Qevap)
 ```
 
-We constructed the energy balance assuming $T_b = T_a$ for illustration. 
-Thus, the energy balance was dominated by heat gain from contact with the warmer surface. 
-We now use a function based on the energy balance above to estimate body temperature given the environmental conditions:
+We now use a function based on the Gates energy balance above to estimate body temperature given the environmental conditions:
 
 ```{r}
 Te <- rep(NA, 24)
@@ -456,7 +452,7 @@ Considering how organisms experience their environment is central to understandi
 
 ## Acknowledgements
 
-We thank A. Cannistra, R. Huey, J. Kingsolver, L. Miller, W. Porter, and H. A. Woods for assistance and input and B. Helmuth for providing functions. 
+We thank A. Cannistra, R. Huey, J. Kingsolver, L. Miller, W. Porter, R. Potter, and H. A. Woods for assistance and input and B. Helmuth for providing functions. 
 We particularly thank M. Kearney for extensive input on TrenchR and its alignment with NicheMapR and for contributing two educational modules and code for comparing TrenchR to NicheMapR.
 
 ## Authors' Contributions
