@@ -23,7 +23,6 @@ library(NicheMapR)
 library(devtools)
 
 #source_url('https://github.com/mrke/NicheMapR/blob/master/R/GEOM_ecto.R')
-#source_url('https://github.com/mrke/NicheMapR/blob/master/R/SOLAR_ecto.R')
 ```
 
 We provide the input data corresponding to the manuscript example.
@@ -35,13 +34,14 @@ lon  <- -105.944 # Longitude (degrees)
 elev <- 2121     # Elevation (meters)
 
 # Assumptions
-tau <- 0.7 # Atmospheric transmissivity # MRK change from 0.7 to 0.75
+tau <- 0.7 # Atmospheric transmissivity
 rho <- 0.6 # Albedo
 Tb0 <- 25  # Initial assumption of body temperature (C)
 doy <- day_of_year("2021-06-15", format = "%Y-%m-%d") # Day of year, changed to mid June to correspond to micro_global data
 z <- 0.02 # height of animal
 psa_g <- 0.33 # fraction of animal surface contacting the ground
 K_skin <- 0.5 # parameter for thermal conductivity of skin, W/mC
+K_sub <- 0.5 # parameter for thermal conductivity of substrate, W/mC
 ```
 
 We then run the NicheMapR microclimate model for clear sky conditions at this site, passing elevation (would otherwise have been 2257m), soil albedo and animal height used in the example. The microclimate model output is prepared as model input.
@@ -319,20 +319,20 @@ We estimate operative temperatures as in the manuscript, but add the biophysical
 # General biophysical model from Gates (1980)
 Te <- rep(NA, 24)
 for (hour in 1:24) {
-  Te[hour] <- Tb_Gates(A = A, D = 0.025, psa_dir = psa[hour], psa_ref = 0.5 * (1 - psa_g), psa_air = 1 - psa_g, psa_g = psa_g, T_g = Ts[hour], T_a = Ta_liz[hour], Qabs = Qabs[hour], epsilon = epsilon_s, H_L = H_L, ef = 1.3, K = K_sub) # MRK made D = 2.5 cm and passed K_sub
+  Te[hour] <- Tb_Gates(A = A, D = D, psa_dir = psa[hour], psa_ref = 0.5 * (1 - psa_g), psa_air = 1 - psa_g, psa_g = psa_g, T_g = Ts[hour], T_a = Ta_liz[hour], Qabs = Qabs[hour], epsilon = epsilon_s, H_L = H_L, ef = 1.3, K = K_sub) # MRK made D = 2.5 cm and passed K_sub
 }
 
 # General biophysical model from Campbell and Norman (2000)
 Te2 <- rep(NA, 24)
 for (hr in 1:24) {
   # S is solar radiation flux (W m^-2), so we divide by surface area, A
-  Te2[hr] <- Tb_CampbellNorman(T_a = Ta_liz[hr], T_g = Ts[hr], S = Qabs[hr] / A, a_l = 0.96, epsilon = epsilon_s, c_p = 29.3, D = svl, u = V_liz)
+  Te2[hr] <- Tb_CampbellNorman(T_a = Ta_liz[hr], T_g = Ts[hr], S = Qabs[hr] / A, a_l = 0.96, epsilon = epsilon_s, c_p = 29.3, D = D, u = V_liz)
 }
 
 # Lizard specific biophysical model from Buckley (2008)
 Te3 <- rep(NA, 24)
 for (hour in 1:24) {
-  Te3[hour] <- Tb_lizard(T_a = Ta_liz[hour], T_g = Ts[hour], u = V_liz, svl = svl * 1000, m = mass, psi = psi_deg[hour], rho_s = rho, elev = elev, doy = doy, sun = TRUE, surface = TRUE, a_s = a, a_l = 0.965, epsilon_s = epsilon_s, F_d = 0.8, F_r = 0.5, F_a = 0.5, F_g = 0.5)
+  Te3[hour] <- Tb_lizard(T_a = Ta_liz[hour], T_g = Ts[hour], u = V_liz, svl = D * 1000, m = mass, psi = psi_deg[hour], rho_s = rho, elev = elev, doy = doy, sun = TRUE, surface = TRUE, a_s = a, a_l = 0.965, epsilon_s = epsilon_s, F_d = 0.8, F_r = 0.5, F_a = 0.5, F_g = 0.5)
 }
 
 # General biophysical model from NicheMapR, using modular function ectoR_devel()
@@ -370,7 +370,7 @@ We then recreate the plot in the manuscript, adding output from the NicheMapR bi
 ```{r, echo=FALSE}
 par(mar = c(5, 4, 4, 8) + 0.1)
 
-plot(1:24, Te, type = "l", xlab = "Hour", ylab = expression("Temperature ("*~degree*C*")"), col = "#5DC863FF", ylim = c(0,70), las = 1) # Gates
+plot(1:24, Te, type = "l", xlab = "Hour", ylab = expression("Temperature ("*~degree*C*")"), col = "#5DC863FF", ylim = c(0,55), las = 1) # Gates
 points(1:24, Te2, type ="l", col = "#5DC863FF", lty = "dotted") # Campbell and Norman
 points(1:24, Te3, type = "l", col = "#5DC863FF", lty = "dashed") # Lizard, Buckley 2008
 points(1:24, TC, type = "l", col = "orange", lty = "solid") # NicheMapR
@@ -385,7 +385,7 @@ plot(1:24, Sdir, pch = 16, axes = FALSE, xlab = NA, ylab = NA, type = "l", col =
 axis(side = 4, las = 1)
 mtext(side = 4, line = 3, 'Radiation (W/m^2)')
 
-legend("topleft",
+legend("topleft", bty = "n",
        legend = c("Ta (2m)", "Ta (0.02m)", "Ts", "Te", "Te NichemapR", "Radiation"),
        lty = 1, pch = NA, col = c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF","orange", "#FDE725FF"))
 ```
